@@ -34,7 +34,7 @@ class AWMFontBuilder
      * @var array An array of language subsets to use.
      */
     protected $subsetArgs = array('latin', 'latin-ext');
-
+    
     /**
      * Converts weights specified by name to their numeric equivalent
      * and returns 400 if it can't figure it out, just to not break things.
@@ -238,6 +238,16 @@ class AWMFontBuilder
     }//end setSubset()
 
     /**
+     * Tell the browser to prefetch the fonts.gstatic.com domain Google Fonts uses.
+     *
+     * @return void
+     */
+    public static function gfontDnsPreload(): void
+    {
+        echo "<link rel='dns-prefetch' href='//fonts.gstatic.com' />\n";
+    }//end gfontDnsPreload()
+
+    /**
      * Generates the URL for the webfont CSS file. Should be called by the
      * theme when generating the <head />
      *
@@ -279,6 +289,9 @@ class AWMFontBuilder
         $url = add_query_arg($queryArgs, $base);
         $url = esc_url($url);
         wp_enqueue_style($name, $url, null, null);
+        if ($this->mirror === 'fonts.googleapis.com') {
+            add_action('wp_head', '\AWonderPHP\AWMFontBuilder::gfontDnsPreload', 4);
+        }
     }//end addWebfontToHead()
 
     /**
@@ -292,7 +305,6 @@ class AWMFontBuilder
             $this->mirror = WEBFONT_MIRROR;
         } else {
             $this->mirror = 'fonts.googleapis.com';
-            // TODO - add fonts.gstatic.com to dns prefetch
         }
     }//end __construct()
 }//end class
