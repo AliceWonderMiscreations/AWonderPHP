@@ -52,11 +52,13 @@ namespace AWonderPHP\TGMPA;
  *
  * @since 1.0.0
  *
+ * Renamed to \AWonderPHP\TGMPA\PluginActivation for AWonderPHP PSR-4 autoloading.
+ *
  * @package TGM-Plugin-Activation
  * @author  Thomas Griffin
  * @author  Gary Jones
  */
-class TGM_Plugin_Activation
+class PluginActivation
 {
     /**
      * TGMPA version number.
@@ -90,7 +92,7 @@ class TGM_Plugin_Activation
      *
      * @since 1.0.0
      *
-     * @var TGM_Plugin_Activation
+     * @var \AWonderPHP\TGMPA\PluginActivation
      */
     public static $instance;
 
@@ -260,7 +262,7 @@ class TGM_Plugin_Activation
      *
      * @since 1.0.0
      *
-     * @see TGM_Plugin_Activation::init()
+     * @see PluginActivation::init()
      */
     public function __construct()
     {
@@ -329,9 +331,9 @@ class TGM_Plugin_Activation
      *
      * @since 2.0.0
      *
-     * @see TGM_Plugin_Activation::admin_menu()
-     * @see TGM_Plugin_Activation::notices()
-     * @see TGM_Plugin_Activation::styles()
+     * @see PluginActivation::admin_menu()
+     * @see PluginActivation::notices()
+     * @see PluginActivation::styles()
      *
      * @return void
      */
@@ -736,8 +738,8 @@ class TGM_Plugin_Activation
      *
      * @since 1.0.0
      *
-     * @see TGM_Plugin_Activation::init()
-     * @see TGM_Plugin_Activation::install_plugins_page()
+     * @see PluginActivation::init()
+     * @see PluginActivation::install_plugins_page()
      *
      * @return null Return early if user lacks capability to install a plugin.
      */
@@ -2313,7 +2315,7 @@ class TGM_Plugin_Activation
      *
      * @since 2.4.0
      *
-     * @return \TGM_Plugin_Activation The TGM_Plugin_Activation object.
+     * @return \AWonderPHP\TGMPA\PluginActivation The PluginActivation object.
      */
     public static function get_instance()
     {

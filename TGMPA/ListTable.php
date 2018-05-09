@@ -1054,8 +1054,8 @@ class ListTable extends \WP_List_Table
      * Retrieve plugin data, given the plugin name.
      *
      * @since      2.2.0
-     * @deprecated 2.5.0 use {@see TGM_Plugin_Activation::_get_plugin_data_from_name()} instead.
-     * @see        TGM_Plugin_Activation::_get_plugin_data_from_name()
+     * @deprecated 2.5.0 use {@see PluginActivation::_get_plugin_data_from_name()} instead.
+     * @see        PluginActivation::_get_plugin_data_from_name()
      *
      * @param string $name Name of the plugin, as it was registered.
      * @param string $data Optional. Array key of plugin data to return. Default is slug.
@@ -1064,7 +1064,7 @@ class ListTable extends \WP_List_Table
      */
     protected function _get_plugin_data_from_name($name, $data = 'slug')
     {
-        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', 'TGM_Plugin_Activation::_get_plugin_data_from_name()');
+        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', '\AWonderPHP\TGMPA\PluginActivation::_get_plugin_data_from_name()');
 
         return $this->tgmpa->_get_plugin_data_from_name($name, $data);
     }//end _get_plugin_data_from_name()
