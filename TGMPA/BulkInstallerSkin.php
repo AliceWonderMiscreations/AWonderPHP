@@ -279,7 +279,7 @@ class BulkInstallerSkin extends \Bulk_Upgrader_Skin
      */
     public function before_flush_output()
     {
-        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()');
+        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', '\Bulk_Upgrader_Skin::flush_output()');
         $this->flush_output();
     }//end before_flush_output()
 
@@ -296,7 +296,7 @@ class BulkInstallerSkin extends \Bulk_Upgrader_Skin
      */
     public function after_flush_output()
     {
-        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()');
+        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', '\Bulk_Upgrader_Skin::flush_output()');
         $this->flush_output();
         $this->i++;
     }//end after_flush_output()
