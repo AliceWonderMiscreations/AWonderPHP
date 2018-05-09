@@ -113,7 +113,8 @@ class BulkInstaller extends Plugin_Upgrader
     public function __construct($skin = null)
     {
         // Get TGMPA class instance.
-        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'get_instance' ));
+        // TTEESSTT - get_instance or getInstance ???
+        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'getInstance' ));
 
         parent::__construct($skin);
 

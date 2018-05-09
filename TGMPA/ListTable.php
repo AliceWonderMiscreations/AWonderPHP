@@ -113,7 +113,8 @@ class ListTable extends \WP_List_Table
      */
     public function __construct()
     {
-        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'get_instance' ));
+        // TTEESSTT - get_instance or getInstance ???
+        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'getInstance' ));
 
         parent::__construct(
             array(
@@ -177,16 +178,16 @@ class ListTable extends \WP_List_Table
         foreach ($plugins[ $this->view_context ] as $slug => $plugin) {
             $table_data[ $i ]['sanitized_plugin']  = $plugin['name'];
             $table_data[ $i ]['slug']              = $slug;
-            $table_data[ $i ]['plugin']            = '<strong>' . $this->tgmpa->get_info_link($slug) . '</strong>';
+            $table_data[ $i ]['plugin']            = '<strong>' . $this->tgmpa->getInfoLink($slug) . '</strong>';
             $table_data[ $i ]['source']            = $this->get_plugin_source_type_text($plugin['source_type']);
             $table_data[ $i ]['type']              = $this->get_plugin_advise_type_text($plugin['required']);
             $table_data[ $i ]['status']            = $this->get_plugin_status_text($slug);
-            $table_data[ $i ]['installed_version'] = $this->tgmpa->get_installed_version($slug);
+            $table_data[ $i ]['installed_version'] = $this->tgmpa->getInstalledVersion($slug);
             $table_data[ $i ]['minimum_version']   = $plugin['version'];
-            $table_data[ $i ]['available_version'] = $this->tgmpa->does_plugin_have_update($slug);
+            $table_data[ $i ]['available_version'] = $this->tgmpa->doesPluginHaveUpdate($slug);
 
             // Prep the upgrade notice info.
-            $upgrade_notice = $this->tgmpa->get_upgrade_notice($slug);
+            $upgrade_notice = $this->tgmpa->getUpgradeNotice($slug);
             if (! empty($upgrade_notice)) {
                 $table_data[ $i ]['upgrade_notice'] = $upgrade_notice;
 
@@ -219,16 +220,16 @@ class ListTable extends \WP_List_Table
         );
 
         foreach ($this->tgmpa->plugins as $slug => $plugin) {
-            if ($this->tgmpa->is_plugin_active($slug) && false === $this->tgmpa->does_plugin_have_update($slug)) {
+            if ($this->tgmpa->isPluginActive($slug) && false === $this->tgmpa->doesPluginHaveUpdate($slug)) {
                 // No need to display plugins if they are installed, up-to-date and active.
                 continue;
             } else {
                 $plugins['all'][ $slug ] = $plugin;
 
-                if (! $this->tgmpa->is_plugin_installed($slug)) {
+                if (! $this->tgmpa->isPluginInstalled($slug)) {
                     $plugins['install'][ $slug ] = $plugin;
                 } else {
-                    if (false !== $this->tgmpa->does_plugin_have_update($slug)) {
+                    if (false !== $this->tgmpa->doesPluginHaveUpdate($slug)) {
                         $plugins['update'][ $slug ] = $plugin;
                     }
 
@@ -319,11 +320,11 @@ class ListTable extends \WP_List_Table
      */
     protected function get_plugin_status_text($slug)
     {
-        if (! $this->tgmpa->is_plugin_installed($slug)) {
+        if (! $this->tgmpa->isPluginInstalled($slug)) {
             return __('Not Installed', 'tgmpa');
         }
 
-        if (! $this->tgmpa->is_plugin_active($slug)) {
+        if (! $this->tgmpa->isPluginActive($slug)) {
             $install_status = __('Installed But Not Activated', 'tgmpa');
         } else {
             $install_status = __('Active', 'tgmpa');
@@ -331,11 +332,11 @@ class ListTable extends \WP_List_Table
 
         $update_status = '';
 
-        if ($this->tgmpa->does_plugin_require_update($slug) && false === $this->tgmpa->does_plugin_have_update($slug)) {
+        if ($this->tgmpa->doesPluginRequireUpdate($slug) && false === $this->tgmpa->doesPluginHaveUpdate($slug)) {
             $update_status = __('Required Update not Available', 'tgmpa');
-        } elseif ($this->tgmpa->does_plugin_require_update($slug)) {
+        } elseif ($this->tgmpa->doesPluginRequireUpdate($slug)) {
             $update_status = __('Requires Update', 'tgmpa');
-        } elseif (false !== $this->tgmpa->does_plugin_have_update($slug)) {
+        } elseif (false !== $this->tgmpa->doesPluginHaveUpdate($slug)) {
             $update_status = __('Update recommended', 'tgmpa');
         }
 
@@ -418,7 +419,7 @@ class ListTable extends \WP_List_Table
             if (! empty($text)) {
                 $status_links[ $type ] = sprintf(
                     '<a href="%s"%s>%s</a>',
-                    esc_url($this->tgmpa->get_tgmpa_status_url($type)),
+                    esc_url($this->tgmpa->getTgmpaStatusUrl($type)),
                     ( $type === $this->view_context ) ? ' class="current"' : '',
                     sprintf($text, number_format_i18n($count))
                 );
@@ -498,11 +499,11 @@ class ListTable extends \WP_List_Table
     {
         $output = array();
 
-        if ($this->tgmpa->is_plugin_installed($item['slug'])) {
+        if ($this->tgmpa->isPluginInstalled($item['slug'])) {
             $installed = ! empty($item['installed_version']) ? $item['installed_version'] : _x('unknown', 'as in: "version nr unknown"', 'tgmpa');
 
             $color = '';
-            if (! empty($item['minimum_version']) && $this->tgmpa->does_plugin_require_update($item['slug'])) {
+            if (! empty($item['minimum_version']) && $this->tgmpa->doesPluginRequireUpdate($item['slug'])) {
                 $color = ' color: #ff0000; font-weight: bold;';
             }
 
@@ -631,12 +632,12 @@ class ListTable extends \WP_List_Table
         $action_links = array();
 
         // Display the 'Install' action link if the plugin is not yet available.
-        if (! $this->tgmpa->is_plugin_installed($item['slug'])) {
+        if (! $this->tgmpa->isPluginInstalled($item['slug'])) {
             /* translators: %2$s: plugin name in screen reader markup */
             $actions['install'] = __('Install %2$s', 'tgmpa');
         } else {
             // Display the 'Update' action link if an update is available and WP complies with plugin minimum.
-            if (false !== $this->tgmpa->does_plugin_have_update($item['slug']) && $this->tgmpa->canPluginUpdate($item['slug'])) {
+            if (false !== $this->tgmpa->doesPluginHaveUpdate($item['slug']) && $this->tgmpa->canPluginUpdate($item['slug'])) {
                 /* translators: %2$s: plugin name in screen reader markup */
                 $actions['update'] = __('Update %2$s', 'tgmpa');
             }
@@ -656,7 +657,7 @@ class ListTable extends \WP_List_Table
                         'plugin'           => urlencode($item['slug']),
                         'tgmpa-' . $action => $action . '-plugin',
                     ),
-                    $this->tgmpa->get_tgmpa_url()
+                    $this->tgmpa->getTgmpaUrl()
                 ),
                 'tgmpa-' . $action,
                 'tgmpa-nonce'
@@ -835,7 +836,7 @@ class ListTable extends \WP_List_Table
                 }
 
                 // For install: make sure this is a plugin we *can* install and not one already installed.
-                if ('install' === $install_type && true === $this->tgmpa->is_plugin_installed($slug)) {
+                if ('install' === $install_type && true === $this->tgmpa->isPluginInstalled($slug)) {
                     unset($plugins_to_install[ $key ]);
                 }
 
@@ -860,7 +861,7 @@ class ListTable extends \WP_List_Table
 
             // Pass all necessary information if WP_Filesystem is needed.
             $url = wp_nonce_url(
-                $this->tgmpa->get_tgmpa_url(),
+                $this->tgmpa->getTgmpaUrl(),
                 'bulk-' . $this->_args['plural']
             );
 
@@ -894,7 +895,7 @@ class ListTable extends \WP_List_Table
             // Prepare the data for validated plugins for the install/upgrade.
             foreach ($plugins_to_install as $slug) {
                 $name   = $this->tgmpa->plugins[ $slug ]['name'];
-                $source = $this->tgmpa->get_download_url($slug);
+                $source = $this->tgmpa->getDownloadUrl($slug);
 
                 if (! empty($name) && ! empty($source)) {
                     $names[] = $name;
@@ -918,7 +919,7 @@ class ListTable extends \WP_List_Table
             $installer = new \AWonderPHP\TGMPA\BulkInstaller(
                 new \AWonderPHP\TGMPA\BulkInstallerSkin(
                     array(
-                        'url'          => esc_url_raw($this->tgmpa->get_tgmpa_url()),
+                        'url'          => esc_url_raw($this->tgmpa->getTgmpaUrl()),
                         'nonce'        => 'bulk-' . $this->_args['plural'],
                         'names'        => $names,
                         'install_type' => $install_type,
@@ -936,7 +937,7 @@ class ListTable extends \WP_List_Table
 
             if ('tgmpa-bulk-update' === $this->current_action()) {
                 // Inject our info into the update transient.
-                $this->tgmpa->inject_update_info($to_inject);
+                $this->tgmpa->injectUpdateInfo($to_inject);
 
                 $installer->bulk_upgrade($file_paths);
             } else {

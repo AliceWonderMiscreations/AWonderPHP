@@ -111,7 +111,8 @@ class BulkInstallerSkin extends \Bulk_Upgrader_Skin
     public function __construct($args = array())
     {
         // Get TGMPA class instance.
-        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'get_instance' ));
+        // TTEESSTT - get_instance or getInstance ???
+        $this->tgmpa = call_user_func(array( get_class($GLOBALS['tgmpa']), 'getInstance' ));
 
         // Parse default and new args.
         $defaults = array(
@@ -247,7 +248,7 @@ class BulkInstallerSkin extends \Bulk_Upgrader_Skin
                 '<a href="' . esc_url(self_admin_url()) . '">' . esc_html($this->tgmpa->strings['dashboard']) . '</a>'
             );
         } else {
-            $update_actions['tgmpa_page'] = '<a href="' . esc_url($this->tgmpa->get_tgmpa_url()) . '" target="_parent">' . esc_html($this->tgmpa->strings['return']) . '</a>';
+            $update_actions['tgmpa_page'] = '<a href="' . esc_url($this->tgmpa->getTgmpaUrl()) . '" target="_parent">' . esc_html($this->tgmpa->strings['return']) . '</a>';
         }
 
         /**

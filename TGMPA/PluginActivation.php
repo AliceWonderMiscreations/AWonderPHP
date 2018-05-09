@@ -43,6 +43,11 @@ declare(strict_types=1);
 
 namespace AWonderPHP\TGMPA;
 
+// make sure core get_plugins function is available
+if (! function_exists('get_plugins')) {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
 /**
  * Automatic plugin installation and activation library.
  *
@@ -303,7 +308,7 @@ class PluginActivation
      * @return void  Silently fail to set the property when this is tried from outside of this class context.
      *               (Inside this class context, the __set() method if not used as there is direct access.)
      */
-    public function __set($name, $value)
+    public function __set($name, $value): void
     {
         return;
     }//end __set()
@@ -337,7 +342,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function init()
+    public function init(): void
     {
         /**
          * By default TGMPA only loads on the WP back-end and not in an Ajax call. Using this filter
@@ -459,7 +464,7 @@ class PluginActivation
         add_action('load-plugins.php', array( $this, 'addPluginActionLinkFilters' ), 1);
 
         // Make sure things get reset on switch theme.
-        add_action('switch_theme', array( $this, 'flush_plugins_cache' ));
+        add_action('switch_theme', array( $this, 'flushPluginsCache' ));
 
         if ($this->has_notices) {
             add_action('switch_theme', array( $this, 'update_dismiss' ));
@@ -467,7 +472,7 @@ class PluginActivation
 
         // Setup the force activation hook.
         if (true === $this->has_forced_activation) {
-            add_action('admin_init', array( $this, 'force_activation' ));
+            add_action('admin_init', array( $this, 'forceActivation' ));
         }
 
         // Setup the force deactivation hook.
@@ -494,7 +499,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function load_textdomain()
+    public function load_textdomain(): void
     {
         if (is_textdomain_loaded('tgmpa')) {
             return;
@@ -556,7 +561,7 @@ class PluginActivation
      *
      * @return string $mofile
      */
-    public function overload_textdomain_mofile($mofile, $domain)
+    public function overload_textdomain_mofile($mofile, $domain): string
     {
         // Exit early if not our domain, not a WP_LANG_DIR load or if the file exists and is readable.
         if ('tgmpa' !== $domain || false === strpos($mofile, WP_LANG_DIR) || @is_readable($mofile)) {
@@ -589,15 +594,15 @@ class PluginActivation
     {
         foreach ($this->plugins as $slug => $plugin) {
             if (false === $this->canPluginActivate($slug)) {
-                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filter_plugin_action_links_activate' ), 20);
+                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filterPluginActionLinksActivate' ), 20);
             }
 
             if (true === $plugin['force_activation']) {
-                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filter_plugin_action_links_deactivate' ), 20);
+                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filterPluginActionLinksDeactivate' ), 20);
             }
 
-            if (false !== $this->does_plugin_require_update($slug)) {
-                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filter_plugin_action_links_update' ), 20);
+            if (false !== $this->doesPluginRequireUpdate($slug)) {
+                add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filterPluginActionLinksUpdate' ), 20);
             }
         }
     }
@@ -613,12 +618,12 @@ class PluginActivation
      *
      * @return array
      */
-    public function filter_plugin_action_links_activate($actions)
+    public function filterPluginActionLinksActivate($actions): array
     {
         unset($actions['activate']);
 
         return $actions;
-    }//end filter_plugin_action_links_activate()
+    }
 
 
     /**
@@ -630,12 +635,12 @@ class PluginActivation
      *
      * @return array
      */
-    public function filter_plugin_action_links_deactivate($actions)
+    public function filterPluginActionLinksDeactivate($actions): array
     {
         unset($actions['deactivate']);
 
         return $actions;
-    }//end filter_plugin_action_links_deactivate()
+    }
 
 
     /**
@@ -648,17 +653,17 @@ class PluginActivation
      *
      * @return array
      */
-    public function filter_plugin_action_links_update($actions)
+    public function filterPluginActionLinksUpdate($actions): array
     {
         $actions['update'] = sprintf(
             '<a href="%1$s" title="%2$s" class="edit">%3$s</a>',
-            esc_url($this->get_tgmpa_status_url('update')),
+            esc_url($this->getTgmpaStatusUrl('update')),
             esc_attr__('This plugin needs to be updated to be compatible with your theme.', 'tgmpa'),
             esc_html__('Update Required', 'tgmpa')
         );
 
         return $actions;
-    }//end filter_plugin_action_links_update()
+    }
 
 
     /**
@@ -682,9 +687,9 @@ class PluginActivation
      * @global string $tab Used as iframe div class names, helps with styling
      * @global string $body_id Used as the iframe body ID, helps with styling
      *
-     * @return null Returns early if not the TGMPA page.
+     * @return void Returns early if not the TGMPA page.
      */
-    public function adminInit()
+    public function adminInit(): void
     {
         if (! $this->is_tgmpa_page()) {
             return;
@@ -720,7 +725,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function thickbox()
+    public function thickbox(): void
     {
         if (! get_user_meta(get_current_user_id(), 'tgmpa_dismissed_notice_' . $this->id, true)) {
             add_thickbox();
@@ -739,11 +744,11 @@ class PluginActivation
      * @since 1.0.0
      *
      * @see PluginActivation::init()
-     * @see PluginActivation::install_plugins_page()
+     * @see PluginActivation::installPluginsPage()
      *
-     * @return null Return early if user lacks capability to install a plugin.
+     * @return void Return early if user lacks capability to install a plugin.
      */
-    public function adminMenu()
+    public function adminMenu(): void
     {
         // Make sure privileges are correct to see the page.
         if (! current_user_can('install_plugins')) {
@@ -758,7 +763,7 @@ class PluginActivation
                 'menu_title'  => $this->strings['menu_title'],           // Menu title.
                 'capability'  => $this->capability,                      // Capability.
                 'menu_slug'   => $this->menu,                            // Menu slug.
-                'function'    => array( $this, 'install_plugins_page' ), // Callback.
+                'function'    => array( $this, 'installPluginsPage' ),   // Callback.
             )
         );
 
@@ -801,15 +806,15 @@ class PluginActivation
      *
      * @since 1.0.0
      *
-     * @return null Aborts early if we're processing a plugin installation action.
+     * @return void Aborts early if we're processing a plugin installation action.
      */
-    public function install_plugins_page()
+    public function installPluginsPage(): void
     {
         // Store new instance of plugin table in object.
         $plugin_table = new \AWonderPHP\TGMPA\ListTable();
 
         // Return early if processing a plugin installation action.
-        if (( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install()) {
+        if (( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->doPluginInstall()) {
             return;
         }
 
@@ -835,7 +840,7 @@ class PluginActivation
                 </form>
             </div>
             <?php
-    }//end install_plugins_page()
+    }
 
 
     /**
@@ -858,7 +863,7 @@ class PluginActivation
      *
      * @return boolean True on success, false on failure.
      */
-    protected function do_plugin_install()
+    protected function doPluginInstall(): bool
     {
         if (empty($_GET['plugin'])) {
             return false;
@@ -887,7 +892,7 @@ class PluginActivation
                         'plugin'                 => urlencode($slug),
                         'tgmpa-' . $install_type => $install_type . '-plugin',
                     ),
-                    $this->get_tgmpa_url()
+                    $this->getTgmpaUrl()
                 ),
                 'tgmpa-' . $install_type,
                 'tgmpa-nonce'
@@ -910,8 +915,8 @@ class PluginActivation
             // Prep variables for Plugin_Installer_Skin class.
             $extra         = array();
             $extra['slug'] = $slug; // Needed for potentially renaming of directory name.
-            $source        = $this->get_download_url($slug);
-            $api           = ( 'repo' === $this->plugins[ $slug ]['source_type'] ) ? $this->get_plugins_api($slug) : null;
+            $source        = $this->getDownloadUrl($slug);
+            $api           = ( 'repo' === $this->plugins[ $slug ]['source_type'] ) ? $this->getPluginsApi($slug) : null;
             $api           = ( false !== $api ) ? $api : null;
 
             $url = add_query_arg(
@@ -957,7 +962,7 @@ class PluginActivation
                     $slug => $this->plugins[ $slug ],
                 );
                 $to_inject[ $slug ]['source'] = $source;
-                $this->inject_update_info($to_inject);
+                $this->injectUpdateInfo($to_inject);
 
                 $upgrader->upgrade($this->plugins[ $slug ]['file_path']);
             } else {
@@ -971,7 +976,7 @@ class PluginActivation
 
             // Only activate plugins if the config option is set to true and the plugin isn't
             // already active (upgrade).
-            if ($this->is_automatic && ! $this->is_plugin_active($slug)) {
+            if ($this->is_automatic && ! $this->isPluginActive($slug)) {
                 $plugin_activate = $upgrader->plugin_info(); // Grab the plugin info from the Plugin_Upgrader method.
                 if (false === $this->activateSinglePlugin($plugin_activate, $slug, true)) {
                     return true; // Finish execution of the function early as we encountered an error.
@@ -985,7 +990,7 @@ class PluginActivation
                 echo '<p>', sprintf(esc_html($this->strings['complete']), '<a href="' . esc_url(self_admin_url()) . '">' . esc_html($this->strings['dashboard']) . '</a>'), '</p>';
                 echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
             } else {
-                echo '<p><a href="', esc_url($this->get_tgmpa_url()), '" target="_parent">', esc_html($this->strings['return']), '</a></p>';
+                echo '<p><a href="', esc_url($this->getTgmpaUrl()), '" target="_parent">', esc_html($this->strings['return']), '</a></p>';
             }
 
             return true;
@@ -999,7 +1004,7 @@ class PluginActivation
         }
 
         return false;
-    }//end do_plugin_install()
+    }
 
 
     /**
@@ -1011,7 +1016,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function inject_update_info($plugins)
+    public function injectUpdateInfo($plugins): void
     {
         $repo_updates = get_site_transient('update_plugins');
 
@@ -1037,7 +1042,7 @@ class PluginActivation
         }
 
         set_site_transient('update_plugins', $repo_updates);
-    }//end inject_update_info()
+    }
 
 
     /**
@@ -1057,7 +1062,7 @@ class PluginActivation
      *
      * @return string $source
      */
-    public function maybe_adjust_source_dir($source, $remote_source, $upgrader)
+    public function maybe_adjust_source_dir($source, $remote_source, $upgrader): string
     {
         if (! $this->is_tgmpa_page() || ! is_object($GLOBALS['wp_filesystem'])) {
             return $source;
@@ -1140,7 +1145,7 @@ class PluginActivation
 
             if (is_wp_error($activate)) {
                 echo '<div id="message" class="error"><p>', wp_kses_post($activate->get_error_message()), '</p></div>',
-                    '<p><a href="', esc_url($this->get_tgmpa_url()), '" target="_parent">', esc_html($this->strings['return']), '</a></p>';
+                    '<p><a href="', esc_url($this->getTgmpaUrl()), '" target="_parent">', esc_html($this->strings['return']), '</a></p>';
 
                 return false; // End it here if there is an error with activation.
             } else {
@@ -1155,7 +1160,7 @@ class PluginActivation
                     echo '<p>', esc_html($this->strings['plugin_activated']), '</p>';
                 }
             }
-        } elseif ($this->is_plugin_active($slug)) {
+        } elseif ($this->isPluginActive($slug)) {
             // No simpler message format provided as this message should never be encountered
             // on the plugin install page.
             echo '<div id="message" class="error"><p>',
@@ -1164,7 +1169,7 @@ class PluginActivation
                     '<strong>' . esc_html($this->plugins[ $slug ]['name']) . '</strong>'
                 ),
                 '</p></div>';
-        } elseif ($this->does_plugin_require_update($slug)) {
+        } elseif ($this->doesPluginRequireUpdate($slug)) {
             if (! $automatic) {
                 // Make sure message doesn't display again if bulk activation is performed
                 // immediately after a single activation.
@@ -1199,12 +1204,12 @@ class PluginActivation
      *
      * @global object $current_screen
      *
-     * @return null Returns early if we're on the Install page.
+     * @return void Returns early if we're on the Install page.
      */
-    public function notices()
+    public function notices(): void
     {
         // Remove nag on the install page / Return early if the nag message has been dismissed or user < author.
-        if (( $this->is_tgmpa_page() || $this->is_core_update_page() ) || get_user_meta(get_current_user_id(), 'tgmpa_dismissed_notice_' . $this->id, true) || ! current_user_can(apply_filters('tgmpa_show_admin_notice_capability', 'publish_posts'))) {
+        if (( $this->is_tgmpa_page() || $this->isCoreUpdatePage() ) || get_user_meta(get_current_user_id(), 'tgmpa_dismissed_notice_' . $this->id, true) || ! current_user_can(apply_filters('tgmpa_show_admin_notice_capability', 'publish_posts'))) {
             return;
         }
 
@@ -1218,11 +1223,11 @@ class PluginActivation
         $total_required_action_count = 0;
 
         foreach ($this->plugins as $slug => $plugin) {
-            if ($this->is_plugin_active($slug) && false === $this->does_plugin_have_update($slug)) {
+            if ($this->isPluginActive($slug) && false === $this->doesPluginHaveUpdate($slug)) {
                 continue;
             }
 
-            if (! $this->is_plugin_installed($slug)) {
+            if (! $this->isPluginInstalled($slug)) {
                 if (current_user_can('install_plugins')) {
                     $install_link_count++;
 
@@ -1236,7 +1241,7 @@ class PluginActivation
                     $total_required_action_count++;
                 }
             } else {
-                if (! $this->is_plugin_active($slug) && $this->canPluginActivate($slug)) {
+                if (! $this->isPluginActive($slug) && $this->canPluginActivate($slug)) {
                     if (current_user_can('activate_plugins')) {
                         $activate_link_count++;
 
@@ -1251,13 +1256,13 @@ class PluginActivation
                     }
                 }
 
-                if ($this->does_plugin_require_update($slug) || false !== $this->does_plugin_have_update($slug)) {
+                if ($this->doesPluginRequireUpdate($slug) || false !== $this->doesPluginHaveUpdate($slug)) {
                     if (current_user_can('update_plugins')) {
                         $update_link_count++;
 
-                        if ($this->does_plugin_require_update($slug)) {
+                        if ($this->doesPluginRequireUpdate($slug)) {
                             $message['notice_ask_to_update'][] = $slug;
-                        } elseif (false !== $this->does_plugin_have_update($slug)) {
+                        } elseif (false !== $this->doesPluginHaveUpdate($slug)) {
                             $message['notice_ask_to_update_maybe'][] = $slug;
                         }
                     }
@@ -1280,7 +1285,7 @@ class PluginActivation
 
             if (! current_user_can('activate_plugins') && ! current_user_can('install_plugins') && ! current_user_can('update_plugins')) {
                 $rendered  = esc_html($this->strings['notice_cannot_install_activate']) . ' ' . esc_html($this->strings['contact_admin']);
-                $rendered .= $this->create_user_action_links_for_notice(0, 0, 0, $line_template);
+                $rendered .= $this->createUserActionLinksForNotice(0, 0, 0, $line_template);
             } else {
                 // If dismissable is false and a message is set, output it now.
                 if (! $this->dismissable && ! empty($this->dismiss_msg)) {
@@ -1293,7 +1298,7 @@ class PluginActivation
 
                     // Get the external info link for a plugin if one is available.
                     foreach ($plugin_group as $plugin_slug) {
-                        $linked_plugins[] = $this->get_info_link($plugin_slug);
+                        $linked_plugins[] = $this->getInfoLink($plugin_slug);
                     }
                     unset($plugin_slug);
 
@@ -1313,16 +1318,16 @@ class PluginActivation
                 }
                 unset($type, $plugin_group, $linked_plugins, $count, $last_plugin, $imploded);
 
-                $rendered .= $this->create_user_action_links_for_notice($install_link_count, $update_link_count, $activate_link_count, $line_template);
+                $rendered .= $this->createUserActionLinksForNotice($install_link_count, $update_link_count, $activate_link_count, $line_template);
             }
 
             // Register the nag messages and prepare them to be processed.
-            add_settings_error('tgmpa', 'tgmpa', $rendered, $this->get_admin_notice_class());
+            add_settings_error('tgmpa', 'tgmpa', $rendered, $this->getAdminNoticeClass());
         }
 
         // Admin options pages already output settings_errors, so this is to avoid duplication.
         if ('options-general' !== $GLOBALS['current_screen']->parent_base) {
-            $this->display_settings_errors();
+            $this->displaySettingsErrors();
         }
     }//end notices()
 
@@ -1339,7 +1344,7 @@ class PluginActivation
      *
      * @return string Action links.
      */
-    protected function create_user_action_links_for_notice($install_count, $update_count, $activate_count, $line_template)
+    protected function createUserActionLinksForNotice($install_count, $update_count, $activate_count, $line_template): string
     {
         // Setup action links.
         $action_links = array(
@@ -1356,14 +1361,14 @@ class PluginActivation
                 $action_links['install'] = sprintf(
                     $link_template,
                     translate_nooped_plural($this->strings['install_link'], $install_count, 'tgmpa'),
-                    esc_url($this->get_tgmpa_status_url('install'))
+                    esc_url($this->getTgmpaStatusUrl('install'))
                 );
             }
             if ($update_count > 0) {
                 $action_links['update'] = sprintf(
                     $link_template,
                     translate_nooped_plural($this->strings['update_link'], $update_count, 'tgmpa'),
-                    esc_url($this->get_tgmpa_status_url('update'))
+                    esc_url($this->getTgmpaStatusUrl('update'))
                 );
             }
         }
@@ -1372,7 +1377,7 @@ class PluginActivation
             $action_links['activate'] = sprintf(
                 $link_template,
                 translate_nooped_plural($this->strings['activate_link'], $activate_count, 'tgmpa'),
-                esc_url($this->get_tgmpa_status_url('activate'))
+                esc_url($this->getTgmpaStatusUrl('activate'))
             );
         }
 
@@ -1386,7 +1391,7 @@ class PluginActivation
         } else {
             return '';
         }
-    }//end create_user_action_links_for_notice()
+    }
 
 
     /**
@@ -1399,7 +1404,7 @@ class PluginActivation
      *
      * @return string
      */
-    protected function get_admin_notice_class()
+    protected function getAdminNoticeClass(): string
     {
         if (! empty($this->strings['nag_type'])) {
             return sanitize_html_class(strtolower($this->strings['nag_type']));
@@ -1412,7 +1417,7 @@ class PluginActivation
                 return 'updated';
             }
         }
-    }//end get_admin_notice_class()
+    }
 
 
     /**
@@ -1422,7 +1427,7 @@ class PluginActivation
      *
      * @return void
      */
-    protected function display_settings_errors()
+    protected function displaySettingsErrors(): void
     {
         global $wp_settings_errors;
 
@@ -1434,7 +1439,7 @@ class PluginActivation
                 break;
             }
         }
-    }//end display_settings_errors()
+    }
 
 
     /**
@@ -1447,7 +1452,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function dismiss()
+    public function dismiss(): void
     {
         if (isset($_GET['tgmpa-dismiss']) && check_admin_referer('tgmpa-dismiss-' . get_current_user_id())) {
             update_user_meta(get_current_user_id(), 'tgmpa_dismissed_notice_' . $this->id, 1);
@@ -1465,9 +1470,9 @@ class PluginActivation
      *
      * @param array|null $plugin Array of plugin arguments or null if invalid argument.
      *
-     * @return null Return early if incorrect argument.
+     * @return void Return early if incorrect argument.
      */
-    public function register($plugin)
+    public function register($plugin): void
     {
         if (empty($plugin['slug']) || empty($plugin['name'])) {
             return;
@@ -1504,7 +1509,7 @@ class PluginActivation
 
         // Enrich the received data.
         $plugin['file_path']   = $this->_get_plugin_basename_from_slug($plugin['slug']);
-        $plugin['source_type'] = $this->get_plugin_source_type($plugin['source']);
+        $plugin['source_type'] = $this->getPluginSourceType($plugin['source']);
 
         // Set the class properties.
         $this->plugins[ $plugin['slug'] ]    = $plugin;
@@ -1532,7 +1537,7 @@ class PluginActivation
      *
      * @return string 'repo', 'external', or 'bundled'
      */
-    protected function get_plugin_source_type($source)
+    protected function getPluginSourceType($source): string
     {
         if ('repo' === $source || preg_match(self::WP_REPO_REGEX, $source)) {
             return 'repo';
@@ -1541,7 +1546,7 @@ class PluginActivation
         } else {
             return 'bundled';
         }
-    }//end get_plugin_source_type()
+    }
 
 
     /**
@@ -1559,7 +1564,7 @@ class PluginActivation
      *
      * @return string Sanitized key
      */
-    public function sanitize_key($key)
+    public function sanitize_key($key): string
     {
         $raw_key = $key;
         $key     = preg_replace('`[^A-Za-z0-9_-]`', '', $key);
@@ -1585,7 +1590,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function config($config)
+    public function config($config): void
     {
         $keys = array(
             'id',
@@ -1644,10 +1649,10 @@ class PluginActivation
      *
      * @return void
      */
-    public function flush_plugins_cache($clear_update_cache = true)
+    public function flushPluginsCache($clear_update_cache = true): void
     {
         wp_clean_plugins_cache($clear_update_cache);
-    }//end flush_plugins_cache()
+    }
 
 
     /**
@@ -1660,7 +1665,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function populate_file_path($plugin_slug = '')
+    public function populate_file_path($plugin_slug = ''): void
     {
         if (! empty($plugin_slug) && is_string($plugin_slug) && isset($this->plugins[ $plugin_slug ])) {
             $this->plugins[ $plugin_slug ]['file_path'] = $this->_get_plugin_basename_from_slug($plugin_slug);
@@ -1683,9 +1688,9 @@ class PluginActivation
      *
      * @return string Either file path for plugin if installed, or just the plugin slug.
      */
-    protected function _get_plugin_basename_from_slug($slug)
+    protected function _get_plugin_basename_from_slug($slug): string
     {
-        $keys = array_keys($this->get_plugins());
+        $keys = array_keys($this->getPlugins());
 
         foreach ($keys as $key) {
             if (preg_match('|^' . $slug . '/|', $key)) {
@@ -1731,13 +1736,13 @@ class PluginActivation
      *
      * @return string Plugin download URL or path to local file or empty string if undetermined.
      */
-    public function get_download_url($slug)
+    public function getDownloadUrl($slug): string
     {
         $dl_source = '';
 
         switch ($this->plugins[ $slug ]['source_type']) {
             case 'repo':
-                return $this->get_wp_repo_download_url($slug);
+                return $this->getWpRepoDownloadUrl($slug);
             case 'external':
                 return $this->plugins[ $slug ]['source'];
             case 'bundled':
@@ -1745,7 +1750,7 @@ class PluginActivation
         }
 
         return $dl_source; // Should never happen.
-    }//end get_download_url()
+    }
 
 
     /**
@@ -1757,17 +1762,17 @@ class PluginActivation
      *
      * @return string Plugin download URL.
      */
-    protected function get_wp_repo_download_url($slug)
+    protected function getWpRepoDownloadUrl($slug): string
     {
         $source = '';
-        $api    = $this->get_plugins_api($slug);
+        $api    = $this->getPluginsApi($slug);
 
         if (false !== $api && isset($api->download_link)) {
             $source = $api->download_link;
         }
 
         return $source;
-    }//end get_wp_repo_download_url()
+    }
 
 
     /**
@@ -1779,7 +1784,7 @@ class PluginActivation
      *
      * @return object Plugins_api response object on success, WP_Error on failure.
      */
-    protected function get_plugins_api($slug)
+    protected function getPluginsApi($slug)
     {
         static $api = array(); // Cache received responses.
 
@@ -1808,7 +1813,7 @@ class PluginActivation
         }
 
         return $api[ $slug ];
-    }//end get_plugins_api()
+    }
 
 
     /**
@@ -1821,7 +1826,7 @@ class PluginActivation
      * @return string Fully formed html link to a plugin information page if available
      *                or the plugin name if not.
      */
-    public function get_info_link($slug)
+    public function getInfoLink($slug): string
     {
         if (! empty($this->plugins[ $slug ]['external_url']) && preg_match(self::IS_URL_REGEX, $this->plugins[ $slug ]['external_url'])) {
             $link = sprintf(
@@ -1851,7 +1856,7 @@ class PluginActivation
         }
 
         return $link;
-    }//end get_info_link()
+    }
 
 
     /**
@@ -1861,7 +1866,7 @@ class PluginActivation
      *
      * @return boolean True when on the TGMPA page, false otherwise.
      */
-    protected function is_tgmpa_page()
+    protected function is_tgmpa_page(): bool
     {
         return isset($_GET['page']) && $this->menu === $_GET['page'];
     }//end is_tgmpa_page()
@@ -1874,7 +1879,7 @@ class PluginActivation
      *
      * @return boolean True when on a WP Core installation/upgrade page, false otherwise.
      */
-    protected function is_core_update_page()
+    protected function isCoreUpdatePage(): bool
     {
         // Current screen is not always available, most notably on the customizer screen.
         if (! function_exists('get_current_screen')) {
@@ -1895,7 +1900,7 @@ class PluginActivation
         }
 
         return false;
-    }//end is_core_update_page()
+    }
 
 
     /**
@@ -1908,7 +1913,7 @@ class PluginActivation
      *
      * @return string Properly encoded URL (not escaped).
      */
-    public function get_tgmpa_url()
+    public function getTgmpaUrl(): string
     {
         static $url;
 
@@ -1926,7 +1931,7 @@ class PluginActivation
         }
 
         return $url;
-    }//end get_tgmpa_url()
+    }
 
 
     /**
@@ -1941,15 +1946,15 @@ class PluginActivation
      *
      * @return string Properly encoded URL (not escaped).
      */
-    public function get_tgmpa_status_url($status)
+    public function getTgmpaStatusUrl($status): string
     {
         return add_query_arg(
             array(
                 'plugin_status' => urlencode($status),
             ),
-            $this->get_tgmpa_url()
+            $this->getTgmpaUrl()
         );
-    }//end get_tgmpa_status_url()
+    }
 
 
     /**
@@ -1959,11 +1964,11 @@ class PluginActivation
      *
      * @return bool True if complete, i.e. no outstanding actions. False otherwise.
      */
-    public function is_tgmpa_complete()
+    public function is_tgmpa_complete(): bool
     {
         $complete = true;
         foreach ($this->plugins as $slug => $plugin) {
-            if (! $this->is_plugin_active($slug) || false !== $this->does_plugin_have_update($slug)) {
+            if (! $this->isPluginActive($slug) || false !== $this->doesPluginHaveUpdate($slug)) {
                 $complete = false;
                 break;
             }
@@ -1982,12 +1987,12 @@ class PluginActivation
      *
      * @return bool True if installed, false otherwise.
      */
-    public function is_plugin_installed($slug)
+    public function isPluginInstalled($slug): bool
     {
-        $installed_plugins = $this->get_plugins(); // Retrieve a list of all installed plugins (WP cached).
+        $installed_plugins = $this->getPlugins(); // Retrieve a list of all installed plugins (WP cached).
 
         return ( ! empty($installed_plugins[ $this->plugins[ $slug ]['file_path'] ]) );
-    }//end is_plugin_installed()
+    }
 
 
     /**
@@ -1999,10 +2004,10 @@ class PluginActivation
      *
      * @return bool True if active, false otherwise.
      */
-    public function is_plugin_active($slug)
+    public function isPluginActive($slug): bool
     {
         return ( ( ! empty($this->plugins[ $slug ]['is_callable']) && is_callable($this->plugins[ $slug ]['is_callable']) ) || is_plugin_active($this->plugins[ $slug ]['file_path']) );
-    }//end is_plugin_active()
+    }
 
 
     /**
@@ -2022,7 +2027,7 @@ class PluginActivation
             return true;
         }
 
-        $api = $this->get_plugins_api($slug);
+        $api = $this->getPluginsApi($slug);
 
         if (false !== $api && isset($api->requires)) {
             return version_compare($this->wp_version, $api->requires, '>=');
@@ -2043,12 +2048,12 @@ class PluginActivation
      *
      * @return bool True if OK to proceed with update, false otherwise.
      */
-    public function is_plugin_updatetable($slug)
+    public function is_plugin_updatetable($slug): bool
     {
-        if (! $this->is_plugin_installed($slug)) {
+        if (! $this->isPluginInstalled($slug)) {
             return false;
         } else {
-            return ( false !== $this->does_plugin_have_update($slug) && $this->canPluginUpdate($slug) );
+            return ( false !== $this->doesPluginHaveUpdate($slug) && $this->canPluginUpdate($slug) );
         }
     }//end is_plugin_updatetable()
 
@@ -2065,7 +2070,7 @@ class PluginActivation
      */
     public function canPluginActivate($slug): bool
     {
-        return ( ! $this->is_plugin_active($slug) && ! $this->does_plugin_require_update($slug) );
+        return ( ! $this->isPluginActive($slug) && ! $this->doesPluginRequireUpdate($slug) );
     }
 
 
@@ -2079,16 +2084,16 @@ class PluginActivation
      * @return string Version number as string or an empty string if the plugin is not installed
      *                or version unknown (plugins which don't comply with the plugin header standard).
      */
-    public function get_installed_version($slug)
+    public function getInstalledVersion($slug): string
     {
-        $installed_plugins = $this->get_plugins(); // Retrieve a list of all installed plugins (WP cached).
+        $installed_plugins = $this->getPlugins(); // Retrieve a list of all installed plugins (WP cached).
 
         if (! empty($installed_plugins[ $this->plugins[ $slug ]['file_path'] ]['Version'])) {
             return $installed_plugins[ $this->plugins[ $slug ]['file_path'] ]['Version'];
         }
 
         return '';
-    }//end get_installed_version()
+    }
 
 
     /**
@@ -2100,13 +2105,13 @@ class PluginActivation
      *
      * @return bool True when a plugin needs to be updated, otherwise false.
      */
-    public function does_plugin_require_update($slug)
+    public function doesPluginRequireUpdate($slug): bool
     {
-        $installed_version = $this->get_installed_version($slug);
+        $installed_version = $this->getInstalledVersion($slug);
         $minimum_version   = $this->plugins[ $slug ]['version'];
 
         return version_compare($minimum_version, $installed_version, '>');
-    }//end does_plugin_require_update()
+    }
 
 
     /**
@@ -2118,11 +2123,11 @@ class PluginActivation
      *
      * @return false|string Version number string of the available update or false if no update available.
      */
-    public function does_plugin_have_update($slug)
+    public function doesPluginHaveUpdate($slug)
     {
         // Presume bundled and external plugins will point to a package which meets the minimum required version.
         if ('repo' !== $this->plugins[ $slug ]['source_type']) {
-            if ($this->does_plugin_require_update($slug)) {
+            if ($this->doesPluginRequireUpdate($slug)) {
                 return $this->plugins[ $slug ]['version'];
             }
 
@@ -2136,7 +2141,7 @@ class PluginActivation
         }
 
         return false;
-    }//end does_plugin_have_update()
+    }
 
 
     /**
@@ -2148,7 +2153,7 @@ class PluginActivation
      *
      * @return string The upgrade notice or an empty string if no message was available or provided.
      */
-    public function get_upgrade_notice($slug)
+    public function getUpgradeNotice($slug): string
     {
         // We currently can't get reliable info on non-WP-repo plugins - issue #380.
         if ('repo' !== $this->plugins[ $slug ]['source_type']) {
@@ -2162,11 +2167,11 @@ class PluginActivation
         }
 
         return '';
-    }//end get_upgrade_notice()
+    }
 
 
     /**
-     * Wrapper around the core WP get_plugins function, making sure it's actually available.
+     * Wrapper around the core WP get_plugins function.
      *
      * @since 2.5.0
      *
@@ -2174,14 +2179,10 @@ class PluginActivation
      *
      * @return array Array of installed plugins with plugin information.
      */
-    public function get_plugins($plugin_folder = '')
+    public function getPlugins($plugin_folder = ''): array
     {
-        if (! function_exists('get_plugins')) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
-        }
-
         return get_plugins($plugin_folder);
-    }//end get_plugins()
+    }
 
 
     /**
@@ -2194,7 +2195,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function update_dismiss()
+    public function update_dismiss(): void
     {
         delete_metadata('user', null, 'tgmpa_dismissed_notice_' . $this->id, null, true);
     }//end update_dismiss()
@@ -2216,11 +2217,11 @@ class PluginActivation
      *
      * @return void
      */
-    public function force_activation()
+    public function forceActivation()
     {
         foreach ($this->plugins as $slug => $plugin) {
             if (true === $plugin['force_activation']) {
-                if (! $this->is_plugin_installed($slug)) {
+                if (! $this->isPluginInstalled($slug)) {
                     // Oops, plugin isn't there so iterate to next condition.
                     continue;
                 } elseif ($this->canPluginActivate($slug)) {
@@ -2229,7 +2230,7 @@ class PluginActivation
                 }
             }
         }
-    }//end force_activation()
+    }
 
 
     /**
@@ -2246,7 +2247,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function force_deactivation()
+    public function forceDeactivation(): void
     {
         $deactivated = array();
 
@@ -2255,7 +2256,7 @@ class PluginActivation
      * Only proceed forward if the parameter is set to true and plugin is active
      * as a 'normal' (not must-use) plugin.
      */
-            if (true === $plugin['force_deactivation'] && is_plugin_active($plugin['file_path'])) {
+            if (true === $plugin['force_deactivation'] && isPluginActive($plugin['file_path'])) {
                 deactivate_plugins($plugin['file_path']);
                 $deactivated[ $plugin['file_path'] ] = time();
             }
@@ -2264,7 +2265,7 @@ class PluginActivation
         if (! empty($deactivated)) {
             update_option('recently_activated', $deactivated + (array) get_option('recently_activated'));
         }
-    }//end force_deactivation()
+    }
 
 
     /**
@@ -2317,14 +2318,14 @@ class PluginActivation
      *
      * @return \AWonderPHP\TGMPA\PluginActivation The PluginActivation object.
      */
-    public static function get_instance()
+    public static function getInstance()
     {
         if (! isset(self::$instance) && ! ( self::$instance instanceof self )) {
             self::$instance = new self();
         }
 
         return self::$instance;
-    }//end get_instance()
+    }
 }//end class
 
 ?>
