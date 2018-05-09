@@ -331,7 +331,7 @@ class PluginActivation
      *
      * @since 2.0.0
      *
-     * @see PluginActivation::admin_menu()
+     * @see PluginActivation::adminMenu()
      * @see PluginActivation::notices()
      * @see PluginActivation::styles()
      *
@@ -441,7 +441,7 @@ class PluginActivation
             // Sort the plugins.
             array_multisort($this->sort_order, SORT_ASC, $this->plugins);
 
-            add_action('admin_menu', array( $this, 'admin_menu' ));
+            add_action('admin_menu', array( $this, 'adminMenu' ));
             add_action('admin_head', array( $this, 'dismiss' ));
 
             // Prevent the normal links from showing underneath a single install/update page.
@@ -450,13 +450,13 @@ class PluginActivation
 
             if ($this->has_notices) {
                 add_action('admin_notices', array( $this, 'notices' ));
-                add_action('admin_init', array( $this, 'admin_init' ), 1);
+                add_action('admin_init', array( $this, 'adminInit' ), 1);
                 add_action('admin_enqueue_scripts', array( $this, 'thickbox' ));
             }
         }
 
         // If needed, filter plugin action links.
-        add_action('load-plugins.php', array( $this, 'add_plugin_action_link_filters' ), 1);
+        add_action('load-plugins.php', array( $this, 'addPluginActionLinkFilters' ), 1);
 
         // Make sure things get reset on switch theme.
         add_action('switch_theme', array( $this, 'flush_plugins_cache' ));
@@ -476,7 +476,7 @@ class PluginActivation
         }
 
         // Add CSS for the TGMPA admin page.
-        add_action('admin_head', array( $this, 'admin_css' ));
+        add_action('admin_head', array( $this, 'adminCss' ));
     }//end init()
 
 
@@ -502,9 +502,9 @@ class PluginActivation
 
         if (false !== strpos(__FILE__, WP_PLUGIN_DIR) || false !== strpos(__FILE__, WPMU_PLUGIN_DIR)) {
             // Plugin, we'll need to adjust the file name.
-            add_action('load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10, 2);
+            add_action('load_textdomain_mofile', array( $this, 'correctPluginMofile' ), 10, 2);
             load_theme_textdomain('tgmpa', dirname(__FILE__) . '/languages');
-            remove_action('load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10);
+            remove_action('load_textdomain_mofile', array( $this, 'correctPluginMofile' ), 10);
         } else {
             load_theme_textdomain('tgmpa', dirname(__FILE__) . '/languages');
         }
@@ -526,14 +526,14 @@ class PluginActivation
      *
      * @return string $mofile
      */
-    public function correct_plugin_mofile($mofile, $domain)
+    public function correctPluginMofile($mofile, $domain): string
     {
         // Exit early if not our domain (just in case).
         if ('tgmpa' !== $domain) {
             return $mofile;
         }
         return preg_replace('`/([a-z]{2}_[A-Z]{2}.mo)$`', '/tgmpa-$1', $mofile);
-    }//end correct_plugin_mofile()
+    }
 
 
     /**
@@ -585,10 +585,10 @@ class PluginActivation
      *
      * @return void
      */
-    public function add_plugin_action_link_filters()
+    public function addPluginActionLinkFilters(): void
     {
         foreach ($this->plugins as $slug => $plugin) {
-            if (false === $this->can_plugin_activate($slug)) {
+            if (false === $this->canPluginActivate($slug)) {
                 add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filter_plugin_action_links_activate' ), 20);
             }
 
@@ -600,7 +600,7 @@ class PluginActivation
                 add_filter('plugin_action_links_' . $plugin['file_path'], array( $this, 'filter_plugin_action_links_update' ), 20);
             }
         }
-    }//end add_plugin_action_link_filters()
+    }
 
 
     /**
@@ -684,7 +684,7 @@ class PluginActivation
      *
      * @return null Returns early if not the TGMPA page.
      */
-    public function admin_init()
+    public function adminInit()
     {
         if (! $this->is_tgmpa_page()) {
             return;
@@ -704,7 +704,7 @@ class PluginActivation
 
             exit;
         }
-    }//end admin_init()
+    }
 
 
     /**
@@ -743,7 +743,7 @@ class PluginActivation
      *
      * @return null Return early if user lacks capability to install a plugin.
      */
-    public function admin_menu()
+    public function adminMenu()
     {
         // Make sure privileges are correct to see the page.
         if (! current_user_can('install_plugins')) {
@@ -762,8 +762,8 @@ class PluginActivation
             )
         );
 
-        $this->add_admin_menu($args);
-    }//end admin_menu()
+        $this->addAdminMenu($args);
+    }
 
 
     /**
@@ -778,7 +778,7 @@ class PluginActivation
      *
      * @return void
      */
-    protected function add_admin_menu(array $args)
+    protected function addAdminMenu(array $args): void
     {
         if (has_filter('tgmpa_admin_menu_use_add_theme_page')) {
             _deprecated_function('The "tgmpa_admin_menu_use_add_theme_page" filter', '2.5.0', esc_html__('Set the parent_slug config variable instead.', 'tgmpa'));
@@ -789,7 +789,7 @@ class PluginActivation
         } else {
             $this->page_hook = call_user_func('add_submenu_page', $args['parent_slug'], $args['page_title'], $args['menu_title'], $args['capability'], $args['menu_slug'], $args['function']);
         }
-    }//end add_admin_menu()
+    }
 
 
     /**
@@ -973,7 +973,7 @@ class PluginActivation
             // already active (upgrade).
             if ($this->is_automatic && ! $this->is_plugin_active($slug)) {
                 $plugin_activate = $upgrader->plugin_info(); // Grab the plugin info from the Plugin_Upgrader method.
-                if (false === $this->activate_single_plugin($plugin_activate, $slug, true)) {
+                if (false === $this->activateSinglePlugin($plugin_activate, $slug, true)) {
                     return true; // Finish execution of the function early as we encountered an error.
                 }
             }
@@ -993,7 +993,7 @@ class PluginActivation
             // Activate action link was clicked.
             check_admin_referer('tgmpa-activate', 'tgmpa-nonce');
 
-            if (false === $this->activate_single_plugin($this->plugins[ $slug ]['file_path'], $slug)) {
+            if (false === $this->activateSinglePlugin($this->plugins[ $slug ]['file_path'], $slug)) {
                 return true; // Finish execution of the function early as we encountered an error.
             }
         }
@@ -1133,9 +1133,9 @@ class PluginActivation
      *
      * @return bool False if an error was encountered, true otherwise.
      */
-    protected function activate_single_plugin($file_path, $slug, $automatic = false)
+    protected function activateSinglePlugin($file_path, $slug, $automatic = false): bool
     {
-        if ($this->can_plugin_activate($slug)) {
+        if ($this->canPluginActivate($slug)) {
             $activate = activate_plugin($file_path);
 
             if (is_wp_error($activate)) {
@@ -1183,7 +1183,7 @@ class PluginActivation
         }
 
         return true;
-    }//end activate_single_plugin()
+    }
 
 
     /**
@@ -1236,7 +1236,7 @@ class PluginActivation
                     $total_required_action_count++;
                 }
             } else {
-                if (! $this->is_plugin_active($slug) && $this->can_plugin_activate($slug)) {
+                if (! $this->is_plugin_active($slug) && $this->canPluginActivate($slug)) {
                     if (current_user_can('activate_plugins')) {
                         $activate_link_count++;
 
@@ -2015,7 +2015,7 @@ class PluginActivation
      *
      * @return bool True if OK to update, false otherwise.
      */
-    public function can_plugin_update($slug)
+    public function canPluginUpdate($slug): bool
     {
         // We currently can't get reliable info on non-WP-repo plugins - issue #380.
         if ('repo' !== $this->plugins[ $slug ]['source_type']) {
@@ -2030,7 +2030,7 @@ class PluginActivation
 
         // No usable info received from the plugins API, presume we can update.
         return true;
-    }//end can_plugin_update()
+    }
 
 
     /**
@@ -2048,7 +2048,7 @@ class PluginActivation
         if (! $this->is_plugin_installed($slug)) {
             return false;
         } else {
-            return ( false !== $this->does_plugin_have_update($slug) && $this->can_plugin_update($slug) );
+            return ( false !== $this->does_plugin_have_update($slug) && $this->canPluginUpdate($slug) );
         }
     }//end is_plugin_updatetable()
 
@@ -2063,10 +2063,10 @@ class PluginActivation
      *
      * @return bool True if OK to activate, false otherwise.
      */
-    public function can_plugin_activate($slug)
+    public function canPluginActivate($slug): bool
     {
         return ( ! $this->is_plugin_active($slug) && ! $this->does_plugin_require_update($slug) );
-    }//end can_plugin_activate()
+    }
 
 
     /**
@@ -2223,7 +2223,7 @@ class PluginActivation
                 if (! $this->is_plugin_installed($slug)) {
                     // Oops, plugin isn't there so iterate to next condition.
                     continue;
-                } elseif ($this->can_plugin_activate($slug)) {
+                } elseif ($this->canPluginActivate($slug)) {
                     // There we go, activate the plugin.
                     activate_plugin($plugin['file_path']);
                 }
@@ -2295,7 +2295,7 @@ class PluginActivation
      *
      * @return void
      */
-    public function admin_css()
+    public function adminCss(): void
     {
         if (! $this->is_tgmpa_page()) {
             return;
@@ -2307,7 +2307,7 @@ class PluginActivation
 				border-left: 3px solid #dc3232;
 			}
 			</style>';
-    }//end admin_css()
+    }
 
 
     /**

@@ -156,7 +156,7 @@ class ListTable extends \WP_List_Table
     protected function _gather_plugin_data()
     {
         // Load thickbox for plugin links.
-        $this->tgmpa->admin_init();
+        $this->tgmpa->adminInit();
         $this->tgmpa->thickbox();
 
         // Categorize the plugins which have open actions.
@@ -232,7 +232,7 @@ class ListTable extends \WP_List_Table
                         $plugins['update'][ $slug ] = $plugin;
                     }
 
-                    if ($this->tgmpa->can_plugin_activate($slug)) {
+                    if ($this->tgmpa->canPluginActivate($slug)) {
                         $plugins['activate'][ $slug ] = $plugin;
                     }
                 }
@@ -636,13 +636,13 @@ class ListTable extends \WP_List_Table
             $actions['install'] = __('Install %2$s', 'tgmpa');
         } else {
             // Display the 'Update' action link if an update is available and WP complies with plugin minimum.
-            if (false !== $this->tgmpa->does_plugin_have_update($item['slug']) && $this->tgmpa->can_plugin_update($item['slug'])) {
+            if (false !== $this->tgmpa->does_plugin_have_update($item['slug']) && $this->tgmpa->canPluginUpdate($item['slug'])) {
                 /* translators: %2$s: plugin name in screen reader markup */
                 $actions['update'] = __('Update %2$s', 'tgmpa');
             }
 
             // Display the 'Activate' action link, but only if the plugin meets the minimum version.
-            if ($this->tgmpa->can_plugin_activate($item['slug'])) {
+            if ($this->tgmpa->canPluginActivate($item['slug'])) {
                 /* translators: %2$s: plugin name in screen reader markup */
                 $actions['activate'] = __('Activate %2$s', 'tgmpa');
             }
@@ -973,7 +973,7 @@ class ListTable extends \WP_List_Table
 
             // Grab the file paths for the selected & inactive plugins from the registration array.
             foreach ($plugins as $slug) {
-                if ($this->tgmpa->can_plugin_activate($slug)) {
+                if ($this->tgmpa->canPluginActivate($slug)) {
                     $plugins_to_activate[] = $this->tgmpa->plugins[ $slug ]['file_path'];
                     $plugin_names[]        = $this->tgmpa->plugins[ $slug ]['name'];
                 }
