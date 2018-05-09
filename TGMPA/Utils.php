@@ -75,6 +75,8 @@ class Utils
     /**
      * Wrap an arbitrary string in <em> tags. Meant to be used in combination with array_map().
      *
+     * Renamed to wrapInEmph for PSR2.
+     *
      * @since 2.5.0
      *
      * @static
@@ -83,15 +85,16 @@ class Utils
      *
      * @return string
      */
-    public static function wrap_in_em($string)
+    public static function wrapInEmph($string): string
     {
         return '<em>' . wp_kses_post($string) . '</em>';
-    }//end wrap_in_em()
-
+    }//end wrapInEmph()
 
     /**
      * Wrap an arbitrary string in <strong> tags. Meant to be used in combination with array_map().
      *
+     * Renamed to wrapInStrong for PSR2.
+     *
      * @since 2.5.0
      *
      * @static
@@ -100,11 +103,10 @@ class Utils
      *
      * @return string
      */
-    public static function wrap_in_strong($string)
+    public static function wrapInStrong($string): string
     {
         return '<strong>' . wp_kses_post($string) . '</strong>';
-    }//end wrap_in_strong()
-
+    }//end wrapInStrong()
 
     /**
      * Helper function: Validate a value as boolean
@@ -117,7 +119,7 @@ class Utils
      *
      * @return bool
      */
-    public static function validate_bool($value)
+    public static function validateBool($value): bool
     {
         if (! isset(self::$has_filters)) {
             self::$has_filters = extension_loaded('filter');
@@ -126,13 +128,14 @@ class Utils
         if (self::$has_filters) {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } else {
-            return self::emulate_filter_bool($value);
+            return self::emulateFilterBool($value);
         }
-    }//end validate_bool()
-
+    }//end validateBool()
 
     /**
      * Helper function: Cast a value to bool
+     *
+     * Raname to emulateFilterBool for PSR2.
      *
      * @since 2.5.0
      *
@@ -142,7 +145,7 @@ class Utils
      *
      * @return bool
      */
-    protected static function emulate_filter_bool($value)
+    protected static function emulateFilterBool($value): bool
     {
         // @codingStandardsIgnoreStart
         static $true  = array(
@@ -179,7 +182,7 @@ class Utils
         }
 
         return false;
-    }//end emulate_filter_bool()
+    }//end emulateFilterBool()
 }//end class
 
 ?>

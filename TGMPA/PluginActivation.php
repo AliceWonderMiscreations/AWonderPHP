@@ -1298,7 +1298,7 @@ class PluginActivation
                     unset($plugin_slug);
 
                     $count          = count($plugin_group);
-                    $linked_plugins = array_map(array( '\AWonderPHP\TGMPA\Utils', 'wrap_in_em' ), $linked_plugins);
+                    $linked_plugins = array_map(array( '\AWonderPHP\TGMPA\Utils', 'wrapInemph' ), $linked_plugins);
                     $last_plugin    = array_pop($linked_plugins); // Pop off last name to prep for readability.
                     $imploded       = empty($linked_plugins) ? $last_plugin : ( implode(', ', $linked_plugins) . ' ' . esc_html_x('and', 'plugin A *and* plugin B', 'tgmpa') . ' ' . $last_plugin );
 
@@ -1498,9 +1498,9 @@ class PluginActivation
         // Forgive users for using string versions of booleans or floats for version number.
         $plugin['version']            = (string) $plugin['version'];
         $plugin['source']             = empty($plugin['source']) ? 'repo' : $plugin['source'];
-        $plugin['required']           = \AWonderPHP\TGMPA\Utils::validate_bool($plugin['required']);
-        $plugin['force_activation']   = \AWonderPHP\TGMPA\Utils::validate_bool($plugin['force_activation']);
-        $plugin['force_deactivation'] = \AWonderPHP\TGMPA\Utils::validate_bool($plugin['force_deactivation']);
+        $plugin['required']           = \AWonderPHP\TGMPA\Utils::validateBool($plugin['required']);
+        $plugin['force_activation']   = \AWonderPHP\TGMPA\Utils::validateBool($plugin['force_activation']);
+        $plugin['force_deactivation'] = \AWonderPHP\TGMPA\Utils::validateBool($plugin['force_deactivation']);
 
         // Enrich the received data.
         $plugin['file_path']   = $this->_get_plugin_basename_from_slug($plugin['slug']);
