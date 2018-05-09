@@ -50,12 +50,14 @@ namespace AWonderPHP\TGMPA;
  *
  * Class was called TGM_Utils in 2.5.0 but renamed TGMPA_Utils in 2.5.1 as this was conflicting with Soliloquy.
  *
+ * Renamed to \AWonderPHP\TGMPA\Utils for AWonderPHP PSR-4 autoloading.
+ *
  * @since 2.5.0
  *
  * @package TGM-Plugin-Activation
  * @author  Juliette Reinders Folmer
  */
-class TGMPA_Utils
+class Utils
 {
     /**
      * Whether the PHP filter extension is enabled.
