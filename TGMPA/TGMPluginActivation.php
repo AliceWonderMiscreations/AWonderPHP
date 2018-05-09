@@ -804,7 +804,7 @@ class TGM_Plugin_Activation
     public function install_plugins_page()
     {
         // Store new instance of plugin table in object.
-        $plugin_table = new TGMPA_List_Table();
+        $plugin_table = new \AWonderPHP\TGMPA\ListTable();
 
         // Return early if processing a plugin installation action.
         if (( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install()) {

@@ -66,11 +66,13 @@ if ( ! class_exists('\WP_List_Table', false)) {
  *
  * @since 2.2.0
  *
+ * Renamed to \AWonderPHP\TGMPA\ListTable for AWonderPHP PSR-4 autoloading.
+ *
  * @package TGM-Plugin-Activation
  * @author  Thomas Griffin
  * @author  Gary Jones
  */
-class TGMPA_List_Table extends \WP_List_Table
+class ListTable extends \WP_List_Table
 {
     /**
      * TGMPA instance.
