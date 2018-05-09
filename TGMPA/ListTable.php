@@ -914,9 +914,9 @@ class ListTable extends \WP_List_Table
             }
             unset($slug, $name, $source);
 
-            // Create a new instance of TGMPA_Bulk_Installer.
-            $installer = new TGMPA_Bulk_Installer(
-                new TGMPA_Bulk_Installer_Skin(
+            // Create a new instance of \AWonderPHP\TGMPA\BulkInstaller.
+            $installer = new \AWonderPHP\TGMPA\BulkInstaller(
+                new \AWonderPHP\TGMPA\BulkInstallerSkin(
                     array(
                         'url'          => esc_url_raw($this->tgmpa->get_tgmpa_url()),
                         'nonce'        => 'bulk-' . $this->_args['plural'],

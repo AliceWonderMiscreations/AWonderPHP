@@ -43,6 +43,10 @@ declare(strict_types=1);
 
 namespace AWonderPHP\TGMPA;
 
+if (! class_exists('\Plugin_Upgrader', false)) {
+    require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+}
+
 /**
  * Installer class to handle bulk plugin installations.
  *
@@ -55,11 +59,13 @@ namespace AWonderPHP\TGMPA;
  * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer to TGMPA_Bulk_Installer.
  *            This was done to prevent backward compatibility issues with v2.3.6.}}
  *
+ * Renamed to \AWonderPHP\TGMPA\BulkInstaller for AWonderPHP PSR-4 autoloading.
+ *
  * @package TGM-Plugin-Activation
  * @author  Thomas Griffin
  * @author  Gary Jones
  */
-class TGMPA_Bulk_Installer extends Plugin_Upgrader
+class BulkInstaller extends Plugin_Upgrader
 {
     /**
      * Holds result of bulk plugin installation.

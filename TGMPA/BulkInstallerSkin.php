@@ -57,11 +57,13 @@ namespace AWonderPHP\TGMPA;
  *
  * @see https://core.trac.wordpress.org/browser/trunk/src/wp-admin/includes/class-wp-upgrader-skins.php
  *
+ * Renamed to \AWonderPHP\TGMPA\BulkInstallerSkin for AWonderPHP PSR-4 autoloading.
+ *
  * @package TGM-Plugin-Activation
  * @author  Thomas Griffin
  * @author  Gary Jones
  */
-class TGMPA_Bulk_Installer_Skin extends \Bulk_Upgrader_Skin
+class BulkInstallerSkin extends \Bulk_Upgrader_Skin
 {
     /**
      * Holds plugin info for each individual plugin installation.
