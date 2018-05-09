@@ -126,7 +126,7 @@ class BulkInstaller extends Plugin_Upgrader
             $this->activate_strings();
         }
 
-        add_action('upgrader_process_complete', array( $this->tgmpa, 'populate_file_path' ));
+        add_action('upgrader_process_complete', array( $this->tgmpa, 'populateFilePath' ));
     }//end __construct()
 
 

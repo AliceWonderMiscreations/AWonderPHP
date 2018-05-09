@@ -744,7 +744,7 @@ class ListTable extends \WP_List_Table
     public function extra_tablenav($which)
     {
         if ('bottom' === $which) {
-            $this->tgmpa->show_tgmpa_version();
+            $this->tgmpa->showTgmpaVersion();
         }
     }//end extra_tablenav()
 
@@ -825,7 +825,7 @@ class ListTable extends \WP_List_Table
 
             // Sanitize the received input.
             $plugins_to_install = array_map('urldecode', $plugins_to_install);
-            $plugins_to_install = array_map(array( $this->tgmpa, 'sanitize_key' ), $plugins_to_install);
+            $plugins_to_install = array_map(array( $this->tgmpa, 'sanitizeKey' ), $plugins_to_install);
 
             // Validate the received input.
             foreach ($plugins_to_install as $key => $slug) {
@@ -841,7 +841,7 @@ class ListTable extends \WP_List_Table
                 }
 
                 // For updates: make sure this is a plugin we *can* update (update available and WP version ok).
-                if ('update' === $install_type && false === $this->tgmpa->is_plugin_updatetable($slug)) {
+                if ('update' === $install_type && false === $this->tgmpa->isPluginUpdatetable($slug)) {
                     unset($plugins_to_install[ $key ]);
                 }
             }
@@ -933,7 +933,7 @@ class ListTable extends \WP_List_Table
 					<div class="update-php" style="width: 100%; height: 98%; min-height: 850px; padding-top: 1px;">';
 
             // Process the bulk installation submissions.
-            add_filter('upgrader_source_selection', array( $this->tgmpa, 'maybe_adjust_source_dir' ), 1, 3);
+            add_filter('upgrader_source_selection', array( $this->tgmpa, 'maybeAdjustSourceDir' ), 1, 3);
 
             if ('tgmpa-bulk-update' === $this->current_action()) {
                 // Inject our info into the update transient.
@@ -944,7 +944,7 @@ class ListTable extends \WP_List_Table
                 $installer->bulk_install($sources);
             }
 
-            remove_filter('upgrader_source_selection', array( $this->tgmpa, 'maybe_adjust_source_dir' ), 1);
+            remove_filter('upgrader_source_selection', array( $this->tgmpa, 'maybeAdjustSourceDir' ), 1);
 
             echo '</div></div>';
 
@@ -966,7 +966,7 @@ class ListTable extends \WP_List_Table
             $plugins = array();
             if (isset($_POST['plugin'])) {
                 $plugins = array_map('urldecode', (array) $_POST['plugin']);
-                $plugins = array_map(array( $this->tgmpa, 'sanitize_key' ), $plugins);
+                $plugins = array_map(array( $this->tgmpa, 'sanitizeKey' ), $plugins);
             }
 
             $plugins_to_activate = array();
@@ -1047,28 +1047,6 @@ class ListTable extends \WP_List_Table
         // Store all of our plugin data into $items array so WP_List_Table can use it.
         $this->items = apply_filters('tgmpa_table_data_items', $this->_gather_plugin_data());
     }//end prepare_items()
-
-
-        /* *********** DEPRECATED METHODS *********** */
-
-    /**
-     * Retrieve plugin data, given the plugin name.
-     *
-     * @since      2.2.0
-     * @deprecated 2.5.0 use {@see PluginActivation::_get_plugin_data_from_name()} instead.
-     * @see        PluginActivation::_get_plugin_data_from_name()
-     *
-     * @param string $name Name of the plugin, as it was registered.
-     * @param string $data Optional. Array key of plugin data to return. Default is slug.
-     *
-     * @return string|boolean Plugin slug if found, false otherwise.
-     */
-    protected function _get_plugin_data_from_name($name, $data = 'slug')
-    {
-        _deprecated_function(__FUNCTION__, 'TGMPA 2.5.0', '\AWonderPHP\TGMPA\PluginActivation::_get_plugin_data_from_name()');
-
-        return $this->tgmpa->_get_plugin_data_from_name($name, $data);
-    }//end _get_plugin_data_from_name()
 }//end class
 
 ?>

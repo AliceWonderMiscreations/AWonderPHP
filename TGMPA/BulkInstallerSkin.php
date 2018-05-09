@@ -235,12 +235,12 @@ class BulkInstallerSkin extends \Bulk_Upgrader_Skin
         // Flush plugins cache so we can make sure that the installed plugins list is always up to date.
         wp_clean_plugins_cache();
 
-        $this->tgmpa->show_tgmpa_version();
+        $this->tgmpa->showTgmpaVersion();
 
         // Display message based on if all plugins are now active or not.
         $update_actions = array();
 
-        if ($this->tgmpa->is_tgmpa_complete()) {
+        if ($this->tgmpa->isTgmpaComplete()) {
             // All plugins are active, so we display the complete string and hide the menu to protect users.
             echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
             $update_actions['dashboard'] = sprintf(
