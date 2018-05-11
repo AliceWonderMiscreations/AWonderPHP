@@ -92,7 +92,7 @@ class Compat
         } else {
             sodium_increment($nonce);
         }
-        $return = time() . '.' . base64_encode($nonce);
+        $return = dechex(time()) . '.' . base64_encode($nonce);
         return $prefix . $return;
     }//end cryptoUniqid()
 }//end class
