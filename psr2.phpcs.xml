@@ -37,6 +37,7 @@
   ]]>
   <description>The coding standard for AWonderPHP</description>
   <file>AWMFontBuilder</file>
+  <file>Compat</file>
   <file>PluggableUnplugged</file>
   <arg name="basepath" value="." />
   <arg name="colors" />
