@@ -57,6 +57,7 @@ class Compat
         if ($more_entropy) {
             sodium_increment($nonce);
             $x = hexdec(substr(bin2hex($nonce), 0, 12));
+            $x = (string) $x;
             $return = $return . substr($x, 2, 1) . '.' . substr($x, -8);
         }
         return $prefix . $return;
