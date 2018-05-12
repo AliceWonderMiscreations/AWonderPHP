@@ -162,12 +162,16 @@ class Compat
                     return false;
                 }
                 break;
-            case 'jpg':
+            case 'jpeg':
                 if (! $image = imagecreatefromjpeg($bitmapname)) {
                     return false;
                 }
                 break;
             case 'webp':
+                if (! function_exists('imagecreatefromwebp')) {
+                    throw new \InvalidArgumentException('Your version of PHP does not have imagecreatefromwebp.');
+                    return false;
+                }
                 if (! $image = imagecreatefromwebp($bitmapname)) {
                     return false;
                 }
