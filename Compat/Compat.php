@@ -216,6 +216,42 @@ class Compat
         }
         return $return;
     }//end bitmap2wbmp()
+
+    /**
+     * Replacement for gmp_random($limiter) function. Note that the php documentation claims that
+     * if the limiter is negative, it spits out negative numbers. That's not the behavior I saw but
+     * that is what I am going to emulate.
+     *
+     * Generates a random integer between 0 and (2^($limiter * pseudolimb)) - 1. If the $limiter is
+     * negative it generates a negative integer.
+     *
+     * @param int $limiter    The limiter.
+     * @param int $pseudolimb The function this emulates uses what GMP calls a limb. It is not
+     *                        static and varies from system to system, but seems to usually be
+     *                        either 32 or 64. It is not public exposed. So I default to a limb
+     *                        size of 64 as that is what it is on my system, but if you want the
+     *                        genuine limb size of your system used and you know it (e.g. from a
+     *                        debugger) you can set it as the second argument.
+     *
+     * @return \GMP A gmp object.
+     */
+    public static function gmpRandom(int $limiter, int $pseudolimb = 64)
+    {
+        $negative = false;
+        if ($limiter < 0) {
+            $negative = true;
+            $limiter = abs($limiter);
+        }
+        if ($pseudolimb < 0) {
+            $pseudolimb = 64;
+        }
+        $exp = ($limiter * $pseudolimb);
+        $rand = gmp_random_bits($exp);
+        if ($negative) {
+            return gmp_neg($rand);
+        }
+        return $rand;
+    }//end gmpRandom()
 }//end class
 
 ?>
