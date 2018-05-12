@@ -95,6 +95,127 @@ class Compat
         $return = dechex(time()) . '.' . base64_encode($nonce);
         return $prefix . $return;
     }//end cryptoUniqid()
+    
+    /**
+     * Drop in replacement for png2wbmp/jpeg2wmp function. Note the [png|jepg]2wbmp function have
+     * height parameter before width which is counter convention, this replacement has to follow
+     * what the original functions did. The threshold parameter is ignored, I could not find
+     * adequate documentation on what it actually meant so I could not emulate it. Patches welcome.
+     *
+     * @param string $bitmapname  The path to a bitmap file to be converted.
+     * @param string $wbmpname    The path to a WBMP file to be created.
+     * @param int    $dest_height The pixel height of destination WBMP.
+     * @param int    $dest_width  The pixel width of destination WBMP.
+     * @param int    $threshold  The threshold value, between 0 and 8 inclusive.
+     *
+     * @return bool True on success, False on failure
+     */
+    public static function bitmap2wbmp(string $bitmapname, string $wbmpname, int $dest_height = 0, int $dest_width = 0, $threshold = 0)
+    {
+        if (! file_exists($bitmapname)) {
+            throw new \InvalidArgumentException('File ' . $bitmapname . ' does not exist.');
+            return false;
+        }
+        // make sure we can create the destination
+        if (file_put_contents($wbmpname, '') === false) {
+            throw new \InvalidArgumentException('Can not write to file ' . $wbmpname);
+            return false;
+        }
+        unlink($wbmpname);
+        $imtype = null;
+        // detect image type
+        if (! class_exists('\finfo', false)) {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            if (! $mime = $finfo->file($bitmapname)) {
+                return false;
+            }
+            switch ($mime) {
+                case 'image/jpeg':
+                    $imtype = 'jpeg';
+                    break;
+                case 'image/png':
+                    $imtype = 'png';
+                    break;
+                case 'image/webp':
+                    $imtype = 'webp';
+                    break;
+            }
+        } else {
+            //sniff type
+            $str = strtolower(basename($bitmapname));
+            $arr = explode('.', $str);
+            $ext = end($arr);
+            switch ($ext) {
+                case 'jpg':
+                    $imtype = 'jpeg';
+                    break;
+                default:
+                    $imtype = $ext;
+                    break;
+            }
+        }
+
+        // gd image from bitmap
+        switch ($imtype) {
+            case 'png':
+                if (! $image = imagecreatefrompng($bitmapname)) {
+                    return false;
+                }
+                break;
+            case 'jpeg':
+                if (! $image = imagecreatefromjpeg($bitmapname)) {
+                    return false;
+                }
+                break;
+            case 'webp':
+                if (! function_exists('imagecreatefromwebp')) {
+                    throw new \InvalidArgumentException('Your version of PHP does not have imagecreatefromwebp.');
+                    return false;
+                }
+                if (! $image = imagecreatefromwebp($bitmapname)) {
+                    return false;
+                }
+                break;
+            default:
+                if (is_null($imtype)) {
+                    $imtype = 'Not Detected';
+                }
+                throw new \InvalidArgumentException('Unsupported image type. Image type was: ' . $imtype);
+                return false;
+        }
+
+        list($o_width, $o_height) = getimagesize($bitmapname);
+        // might not be needed but php documentation does not specify return types of getimagesize
+        $o_width =  intval($o_width, 10);
+        $o_height = intval($o_height, 10);
+        
+        if (($dest_height + $dest_width) === 0) {
+            $dest_width = $o_width;
+            $dest_height = $o_height;
+        }
+        if ($dest_height === 0) {
+            $ratio = round(($dest_width / $o_width), 3);
+            $dest_height = intval(($o_height * $ratio), 10);
+        } elseif ($dest_width === 0) {
+            $ratio = round(($dest_height / $o_height), 3);
+            $dest_width = intval(($o_width * $ratio), 10);
+        }
+        // resize image if needed
+        if (($dest_width !== $o_width) || ($dest_height !== $o_height)) {
+            $newimage = imagecreate($dest_width, $dest_height);
+            imagecopyresampled($newimage, $image, 0, 0, 0, 0, $dest_width, $dest_height, $o_width, $o_height);
+            imagedestroy($image);
+        }
+        // make the WBMP
+        if (isset($newimage)) {
+            $return = imagewbmp($newimage, $wbmpname);
+            imagedestroy($newimage);
+        } else {
+            $return = imagewbmp($image, $wbmpname);
+            imagedestroy($image);
+        }
+        return $return;
+    }//end bitmap2wbmp()
 }//end class
 
 ?>
