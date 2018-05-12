@@ -31,7 +31,7 @@ class UnpluggedStatic
     public static function punycodeDomain(string $domain): string
     {
         if (function_exists('idn_to_ascii')) {
-            $domain=idn_to_ascii($domain);
+            $domain=idn_to_ascii($domain, 0, INTL_IDNA_VARIANT_UTS46);
         }
         return $domain;
     }//end punycodeDomain()
@@ -49,7 +49,7 @@ class UnpluggedStatic
     public static function unpunycodeDomain(string $domain): string
     {
         if (function_exists('idn_to_utf8')) {
-            $domain=idn_to_utf8($domain);
+            $domain=idn_to_utf8($domain, 0, INTL_IDNA_VARIANT_UTS46);
         }
         return $domain;
     }//end unpunycodeDomain()
