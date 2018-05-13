@@ -1,0 +1,29 @@
+Scanning files...
+Analyzing files...
+[0;31mERROR[0m: UndefinedClass - OpenGraph/OpenGraph.php:95:21 - Class or interface AWonderPHP\UnpluggedStatic does not exist
+        $hostname = [97;41m\AWonderPHP\UnpluggedStatic[0m::punycodeDomain($parsed['host']);
+
+
+[0;31mERROR[0m: MismatchingDocblockReturnType - OpenGraph/OpenGraph.php:154:8 - Docblock has incorrect return type 'array<mixed, mixed>|bool', should be 'array<mixed, mixed>'
+    /**
+     * Creates image meta tags.
+     *
+     * @param string $url    The url of the image.
+     * @param string $mime   The MIME type of the image.
+     * @param int    $width  The pixel width of the image.
+     * @param int    $height The pixel height of the image.
+     * @param string $alt    The alt tag for the image.
+     *
+     * [97;41m@return array|bool An array containing either the \DOMNode meta objects or strings[0m
+     *                    representing the image. False if it can not create.
+     */
+    public function addImage(string $url, string $mime, int $width, int $height, string $alt = ''): array
+    {
+
+
+INFO: RedundantConditionGivenDocblockType - OpenGraph/OpenGraph.php:223:17 - Found a contradiction with a docblock-defined type when evaluating $dom and trying to reconcile type 'DOMDocument' to DOMDocument
+            if ([30;47m$dom instanceof \DOMDocument[0m) {
+
+
+Checks took 0.09 seconds and used 14.201MB of memory
+Psalm was able to infer types for 90.161% of the codebase

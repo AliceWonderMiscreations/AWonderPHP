@@ -39,6 +39,7 @@
   <file>AWMFontBuilder</file>
   <file>Compat</file>
   <file>PluggableUnplugged</file>
+  <file>OpenGraph</file>
   <arg name="basepath" value="." />
   <arg name="colors" />
   <rule ref="PSR2">

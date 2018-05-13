@@ -8,6 +8,7 @@
         <directory name="AWMFontBuilder" />
         <directory name="PluggableUnplugged" />
         <directory name="Compat" />
+        <directory name="OpenGraph" />
     </projectFiles>
 
     <issueHandlers>
