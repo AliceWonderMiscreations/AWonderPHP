@@ -20,6 +20,11 @@ namespace AWonderPHP\PluggableUnplugged;
 class PunycodeStatic
 {
     /**
+     * @const VARIANT The IDNA variant to use.
+     */
+    const VARIANT = INTL_IDNA_VARIANT_UTS46;
+
+    /**
      * Takes a valid domain name and returns punycode variant, assuming the
      * idn_to_ascii function is available.
      *
@@ -32,7 +37,7 @@ class PunycodeStatic
     public static function punycodeDomain(string $domain): string
     {
         if (function_exists('idn_to_ascii')) {
-            $domain=idn_to_ascii($domain, 0, INTL_IDNA_VARIANT_UTS46);
+            $domain=idn_to_ascii($domain, 0, self::VARIANT);
         }
         return $domain;
     }//end punycodeDomain()
@@ -50,7 +55,7 @@ class PunycodeStatic
     public static function unpunycodeDomain(string $domain): string
     {
         if (function_exists('idn_to_utf8')) {
-            $domain=idn_to_utf8($domain, 0, INTL_IDNA_VARIANT_UTS46);
+            $domain=idn_to_utf8($domain, 0, self::VARIANT);
         }
         return $domain;
     }//end unpunycodeDomain()

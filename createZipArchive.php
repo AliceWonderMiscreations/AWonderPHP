@@ -17,6 +17,11 @@ $url = 'https://github.com/AliceWonderMiscreations/AWonderPHP';
 $file_hash_algo = 'ripemd160';
 $excludedirlist = array('vendor', 'tests');
 $excludefilelist = array('createZipArchive.php');
+$explicitFiles = array(
+    'README.md',
+    'PluggableUnplugged/README.md',
+    'LICENSE.md'
+);
 
 date_default_timezone_set($timezone);
 $now = time();
@@ -132,6 +137,9 @@ foreach ($dirlist as $dir) {
     addToFileList($dir);
 }
 asort($filelist);
+foreach($explicitFiles as $file) {
+    $filelist[] = $file;
+}
 
 $xmlfilelist = $digest->createElement('filelist');
 $xml->appendChild($xmlfilelist);
