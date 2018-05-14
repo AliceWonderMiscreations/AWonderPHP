@@ -7,7 +7,7 @@ declare(strict_types=1);
  * @package AWonderPHP/WebfontBuilder
  * @author  Alice Wonder <paypal@domblogger.net>
  * @license https://opensource.org/licenses/MIT MIT
- * @version 0.83
+ * @version 0.84
  * @link    https://github.com/AliceWonderMiscreations/AWonderPHP
  */
  
@@ -257,9 +257,9 @@ class AWMFontBuilder
      *
      * @psalm-suppress UndefinedFunction
      *
-     * @return void
+     * @return string|void
      */
-    public function addWebfontToHead(string $name = ''): void
+    public function addWebfontToHead(string $name = '')
     {
         if (count($this->fontArgs) === 0) {
             return;
@@ -285,12 +285,23 @@ class AWMFontBuilder
         $queryArgs = array();
         $queryArgs['family'] = implode('|', $this->fontArgs);
         $queryArgs['subset'] = implode(',', $this->subsetArgs);
-        // wordpress defined functions
-        $url = add_query_arg($queryArgs, $base);
-        $url = esc_url($url);
-        wp_enqueue_style($name, $url, null, null);
-        if ($this->mirror === 'fonts.googleapis.com') {
-            add_action('wp_head', '\AWonderPHP\AWMFontBuilder::gfontDnsPreload', 4);
+        if ((class_exists('\AWonderPHP\PluggableUnplugged\WPCoreReplace::modifyQueryArgs')) || (! defined('WPINC'))) {
+            $url = \AWonderPHP\PluggableUnplugged\WPCoreReplace::modifyQueryArgs($base, $queryArgs);
+        } else {
+            // wordpress defined function
+            $url = add_query_arg($queryArgs, $base);
+        }
+        // for unit testing with phpunit outside WP we need to skip and instead return a string.
+        if (defined('WPINC')) {
+            // wordpress defined functions
+            $url = esc_url($url);
+            wp_enqueue_style($name, $url, null, null);
+            if ($this->mirror === 'fonts.googleapis.com') {
+                add_action('wp_head', '\AWonderPHP\AWMFontBuilder::gfontDnsPreload', 4);
+            }
+        } else {
+            // so we can unit test
+            return $url;
         }
     }//end addWebfontToHead()
 
