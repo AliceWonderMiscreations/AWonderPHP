@@ -18,11 +18,7 @@ namespace AWonderPHP\PluggableUnplugged;
  */
 class UnpluggedStatic
 {
-    
-    
 
-    /* Pluggable Methods */
-    
     /**
      * For use with `wp_hash()` pluggable function. Creates a secure hash string of the
      * specified number of bytes.
@@ -39,7 +35,7 @@ class UnpluggedStatic
      * @param string $data  The string to be hashed.
      * @param string $salt  The key (salt) to be used.
      * @param int    $bytes Optional. The length in bytes for the hash. Defaults to
-     *                        SODIUM_CRYPTO_GENERICHASH_BYTES.
+     *                      SODIUM_CRYPTO_GENERICHASH_BYTES.
      *
      * @return string      The base64 encoded hash
      */
