@@ -13,7 +13,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test class for Misc
+ * Test class for UnpluggedStatic class
  */
 // @codingStandardsIgnoreLine
 final class UnpluggedStaticTest extends TestCase
