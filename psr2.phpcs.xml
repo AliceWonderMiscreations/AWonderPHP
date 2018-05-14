@@ -40,6 +40,7 @@
   <file>Compat</file>
   <file>PluggableUnplugged</file>
   <file>OpenGraph</file>
+  <file>tests</file>
   <arg name="basepath" value="." />
   <arg name="colors" />
   <rule ref="PSR2">

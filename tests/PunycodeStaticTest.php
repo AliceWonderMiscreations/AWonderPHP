@@ -15,11 +15,16 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test class for SimpleCache no strict no encryption
+ * Test class for PunycodeStatic
  */
 // @codingStandardsIgnoreLine
 final class PunycodeStaticTest extends TestCase
 {
+    /**
+     * Test conversion of domain name from UTF8 to ASCII.
+     *
+     * @return void
+     */
     public function testPunycodeDomain(): void
     {
         $domains = array(
@@ -28,12 +33,17 @@ final class PunycodeStaticTest extends TestCase
             '価格.com' => 'xn--1sqt31d.com',
             'example.org' => 'example.org'
         );
-        foreach($domains as $idn => $expected) {
+        foreach ($domains as $idn => $expected) {
             $actual = \AWonderPHP\PluggableUnplugged\PunycodeStatic::punycodeDomain($idn);
             $this->assertEquals($expected, $actual);
         }
-    }
-    
+    }//end testPunycodeDomain()
+
+    /**
+     * Test conversion of domain name from ASCII to UTF8.
+     *
+     * @return void
+     */
     public function testUnpunycodeDomain(): void
     {
         $domains = array(
@@ -42,12 +52,17 @@ final class PunycodeStaticTest extends TestCase
             'xn--1sqt31d.com' => '価格.com',
             'example.org' => 'example.org'
         );
-        foreach($domains as $ascii => $expected) {
+        foreach ($domains as $ascii => $expected) {
             $actual = \AWonderPHP\PluggableUnplugged\PunycodeStatic::unpunycodeDomain($ascii);
             $this->assertEquals($expected, $actual);
         }
-    }
-    
+    }//end testUnpunycodeDomain()
+
+    /**
+     * Test conversion of e-mail address from UTF8 to ASCII.
+     *
+     * @return void
+     */
     public function testPunycodeEmail(): void
     {
         $addresses = array(
@@ -56,9 +71,11 @@ final class PunycodeStaticTest extends TestCase
             'user@価格.com' => 'user@xn--1sqt31d.com',
             'user@example.org' => 'user@example.org'
         );
-        foreach($addresses as $idn => $expected) {
+        foreach ($addresses as $idn => $expected) {
             $actual = \AWonderPHP\PluggableUnplugged\PunycodeStatic::punycodeEmail($idn);
             $this->assertEquals($expected, $actual);
         }
-    }
-}
+    }//end testPunycodeEmail()
+}//end class
+
+?>

@@ -9,6 +9,7 @@
         <directory name="PluggableUnplugged" />
         <directory name="Compat" />
         <directory name="OpenGraph" />
+        <directory name="tests" />
     </projectFiles>
 
     <issueHandlers>
