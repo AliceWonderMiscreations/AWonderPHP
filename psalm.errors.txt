@@ -1,8 +1,0 @@
-Scanning files...
-Analyzing files...
-[0;31mERROR[0m: UndefinedClass - OpenGraph/OpenGraph.php:97:25 - Class or interface AWonderPHP\UnpluggedStatic does not exist
-            $hostname = [97;41m\AWonderPHP\UnpluggedStatic[0m::punycodeDomain($parsed['host']);
-
-
-Checks took 0.10 seconds and used 17.295MB of memory
-Psalm was able to infer types for 89.605% of the codebase
