@@ -94,7 +94,7 @@ class OpenGraph
         }
         $hostname = $parsed['host'];
         if (class_exists('\AWonderPHP\UnpluggedStatic')) {
-            $hostname = \AWonderPHP\UnpluggedStatic::punycodeDomain($parsed['host']);
+            $hostname = \AWonderPHP\PunycodeStatic::punycodeDomain($parsed['host']);
         }
         $clean = $parsed['scheme'] . '://' . $hostname;
         if (isset($parsed['port'])) {
