@@ -2,9 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Unit testing for SimpleCache abstract class. This not only tests the concrete
- * methods that do not depend upon cache implementation but it can serve as a template
- * for implementation unit tests, just do not create the anonymous class.
+ * Unit testing for PunycodeStatic class.
  *
  * @package AWonderPHP
  * @author  Alice Wonder <paypal@domblogger.net>
