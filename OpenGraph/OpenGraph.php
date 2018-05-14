@@ -51,7 +51,7 @@ class OpenGraph
     public $imagemime = array(
         'image/gif',
         'image/jpeg',
-        'image/png',        
+        'image/png',
         'image/webp'
     );
     
@@ -92,7 +92,10 @@ class OpenGraph
         if (! isset($parsed['host'])) {
             return false;
         }
-        $hostname = \AWonderPHP\UnpluggedStatic::punycodeDomain($parsed['host']);
+        $hostname = $parsed['host'];
+        if (class_exists('\AWonderPHP\UnpluggedStatic')) {
+            $hostname = \AWonderPHP\UnpluggedStatic::punycodeDomain($parsed['host']);
+        }
         $clean = $parsed['scheme'] . '://' . $hostname;
         if (isset($parsed['port'])) {
             $clean = $clean . ':' . $parsed['port'];
@@ -141,7 +144,6 @@ class OpenGraph
         return $meta;
     }//end addProperty()
 
-    
     /**
      * Creates image meta tags.
      *
@@ -154,9 +156,10 @@ class OpenGraph
      * @return array|bool An array containing either the \DOMNode meta objects or strings
      *                    representing the image. False if it can not create.
      */
-    public function addImage(string $url, string $mime, int $width, int $height, string $alt = ''): array
+    public function addImage(string $url, string $mime, int $width, int $height, string $alt = '')
     {
-        if (! $url = $this->validUrl) {
+        $url = $this->validUrl($url));
+        if (is_bool($url)) {
             return false;
         }
         $mime = trim(strtolower($mime));
@@ -172,8 +175,8 @@ class OpenGraph
         if (($width <= 0) || ($height <= 0)) {
             return false;
         }
-        (string) $width;
-        (string) $height;
+        $width = (string) $width;
+        $height = (string) $height;
         $return = array();
         if (! is_null($this->dom)) {
             $meta = $this->dom->createElement('meta');
@@ -219,10 +222,8 @@ class OpenGraph
      */
     public function __construct($dom = null)
     {
-        if (is_object($dom)) {
-            if ($dom instanceof \DOMDocument) {
-                $this->dom = $dom;
-            }
+        if ($dom instanceof \DOMDocument) {
+            $this->dom = $dom;
         }
     }//end __construct()
 }//end class
