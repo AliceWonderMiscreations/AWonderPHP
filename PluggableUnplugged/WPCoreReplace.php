@@ -52,7 +52,7 @@ class WPCoreReplace
             $keypair = explode('=', $string);
             $key = $keypair[0];
             $value = $keypair[1];
-            if (! isset($removeQueryArgs[$key])) {
+            if (! in_array($key, $removeQueryArgs)) {
                 $newQueryArray[$key] = $value;
             }
         }
