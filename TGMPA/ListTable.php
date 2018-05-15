@@ -154,14 +154,14 @@ class ListTable extends \WP_List_Table
      *
      * @return array $table_data Information for use in table.
      */
-    protected function _gather_plugin_data()
+    protected function gatherPluginData(): array
     {
         // Load thickbox for plugin links.
         $this->tgmpa->adminInit();
         $this->tgmpa->thickbox();
 
         // Categorize the plugins which have open actions.
-        $plugins = $this->categorize_plugins_to_views();
+        $plugins = $this->categorizePluginsToView();
 
         // Set the counts for the view links.
         $this->set_view_totals($plugins);
@@ -200,8 +200,7 @@ class ListTable extends \WP_List_Table
         }
 
         return $table_data;
-    }//end _gather_plugin_data()
-
+    }//end gatherPluginData()
 
     /**
      * Categorize the plugins which have open actions into views for the TGMPA page.
@@ -210,7 +209,7 @@ class ListTable extends \WP_List_Table
      *
      * @return array
      */
-    protected function categorize_plugins_to_views()
+    protected function categorizePluginsToView(): array
     {
         $plugins = array(
             'all'      => array(), // Meaning: all plugins which still have open actions.
@@ -241,8 +240,7 @@ class ListTable extends \WP_List_Table
         }
 
         return $plugins;
-    }//end categorize_plugins_to_views()
-
+    }
 
     /**
      * Set the counts for the view links.
@@ -440,11 +438,10 @@ class ListTable extends \WP_List_Table
      * @param  string $column_name The name of the column.
      * @return string
      */
-    public function column_default($item, $column_name)
+    public function columnDefault($item, $column_name): string
     {
         return $item[ $column_name ];
-    }//end column_default()
-
+    }//end columnDefault()
 
     /**
      * Required for bulk installing.
@@ -457,7 +454,7 @@ class ListTable extends \WP_List_Table
      *
      * @return string The input checkbox with all necessary info.
      */
-    public function column_cb($item)
+    public function columnCheckbox($item): string
     {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" id="%3$s" />',
@@ -465,7 +462,7 @@ class ListTable extends \WP_List_Table
             esc_attr($item['slug']),
             esc_attr($item['sanitized_plugin'])
         );
-    }//end column_cb()
+    }
 
 
     /**
@@ -476,15 +473,14 @@ class ListTable extends \WP_List_Table
      * @param  array $item Array of item data.
      * @return string The plugin name and action links.
      */
-    public function column_plugin($item)
+    public function columnPlugin($item): string
     {
         return sprintf(
             '%1$s %2$s',
             $item['plugin'],
             $this->row_actions($this->get_row_actions($item), true)
         );
-    }//end column_plugin()
-
+    }//end columnPlugin()
 
     /**
      * Create version information column.
@@ -495,7 +491,7 @@ class ListTable extends \WP_List_Table
      *
      * @return string HTML-formatted version information.
      */
-    public function column_version($item)
+    public function columnVersion($item): string
     {
         $output = array();
 
@@ -539,8 +535,7 @@ class ListTable extends \WP_List_Table
         } else {
             return implode("\n", $output);
         }
-    }//end column_version()
-
+    }//end columnVersion()
 
     /**
      * Sets default message within the plugins table if no plugins
@@ -741,13 +736,12 @@ class ListTable extends \WP_List_Table
      *
      * @return void
      */
-    public function extra_tablenav($which)
+    public function extraTablenav($which): void
     {
         if ('bottom' === $which) {
             $this->tgmpa->showTgmpaVersion();
         }
-    }//end extra_tablenav()
-
+    }//end extraTablenav()
 
     /**
      * Defines the bulk actions for handling registered plugins.
@@ -1045,7 +1039,7 @@ class ListTable extends \WP_List_Table
         }
 
         // Store all of our plugin data into $items array so WP_List_Table can use it.
-        $this->items = apply_filters('tgmpa_table_data_items', $this->_gather_plugin_data());
+        $this->items = apply_filters('tgmpa_table_data_items', $this->gatherPluginData());
     }//end prepare_items()
 }//end class
 
