@@ -38,6 +38,8 @@
   <description>The coding standard for AWonderPHP</description>
   <file>AWMFontBuilder</file>
   <file>Compat</file>
+  <file>Exceptions</file>
+  <file>Groovytar</file>
   <file>PluggableUnplugged</file>
   <file>OpenGraph</file>
   <file>tests</file>
