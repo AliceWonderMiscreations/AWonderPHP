@@ -88,6 +88,20 @@ class WordPressGroovytar extends \AWonderPHP\Groovytar\Groovytar
         }
         return $email;
     }//end getEmailFromIdOrEmail()
+    
+    /**
+     * Creates a footer informing the user their privacy is protected.
+     *
+     * @psalm-suppress UndefinedFunction
+     *
+     * @return void
+     */
+    public static function groovytarFooter(): void
+    {
+        // @codingStandardsIgnoreLine
+        echo('<div style="text-align: center;">' . __('Anonymity protected with') . ' <a href="https://notrackers.com/pluggable-unplugged/" target="_blank">AWM Pluggable Unplugged</a></div>');
+        return;
+    }//end groovytarFooter()
 
 
     /**
