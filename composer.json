@@ -23,6 +23,8 @@
     "autoload": {
         "psr-4": {
             "AWonderPHP\\": ["AWMFontBuilder/", "Compat/", "OpenGraph/"],
+            "AWonderPHP\\Exceptions\\": "Exceptions/",
+            "AWonderPHP\\Groovytar\\": "Groovytar/",
             "AWonderPHP\\PluggableUnplugged\\": "PluggableUnplugged/"
         }
     }

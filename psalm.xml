@@ -8,6 +8,8 @@
         <directory name="AWMFontBuilder" />
         <directory name="PluggableUnplugged" />
         <directory name="Compat" />
+        <directory name="Exceptions" />
+        <directory name="Groovytar" />
         <directory name="OpenGraph" />
         <directory name="tests" />
     </projectFiles>
