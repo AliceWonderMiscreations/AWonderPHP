@@ -799,7 +799,7 @@ class PluginActivation
         $plugin_table = new \AWonderPHP\TGMPA\ListTable();
 
         // Return early if processing a plugin installation action.
-        if (( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->doPluginInstall()) {
+        if (( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->processBulkActions() ) || $this->doPluginInstall()) {
             return;
         }
 
@@ -809,7 +809,7 @@ class PluginActivation
         ?>
         <div class="tgmpa wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <?php $plugin_table->prepare_items(); ?>
+            <?php $plugin_table->prepareItems(); ?>
 
             <?php
             if (! empty($this->message) && is_string($this->message)) {

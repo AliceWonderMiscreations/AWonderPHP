@@ -191,7 +191,7 @@ class ListTable extends \WP_List_Table
             if (! empty($upgrade_notice)) {
                 $table_data[ $i ]['upgrade_notice'] = $upgrade_notice;
 
-                add_action("tgmpa_after_plugin_row_{$slug}", array( $this, 'wp_plugin_update_row' ), 10, 2);
+                add_action("tgmpa_after_plugin_row_{$slug}", array( $this, 'wpPluginUpdateRow' ), 10, 2);
             }
 
             $table_data[ $i ] = apply_filters('tgmpa_table_data_item', $table_data[ $i ], $plugin);
@@ -709,7 +709,7 @@ class ListTable extends \WP_List_Table
      *
      * @return null Return early if upgrade notice is empty.
      */
-    public function wp_plugin_update_row($slug, $item)
+    public function wpPluginUpdateRow($slug, $item)
     {
         if (empty($item['upgrade_notice'])) {
             return;
@@ -724,8 +724,7 @@ class ListTable extends \WP_List_Table
 						</div>
 					</td>
 				</tr>';
-    }//end wp_plugin_update_row()
-
+    }
 
     /**
      * Extra controls to be displayed between bulk actions and pagination.
@@ -750,7 +749,7 @@ class ListTable extends \WP_List_Table
      *
      * @return array $actions The bulk actions for the plugin install table.
      */
-    public function get_bulk_actions()
+    public function getBulkActions()
     {
 
         $actions = array();
@@ -771,7 +770,7 @@ class ListTable extends \WP_List_Table
         }
 
         return $actions;
-    }//end get_bulk_actions()
+    }
 
 
     /**
@@ -784,7 +783,7 @@ class ListTable extends \WP_List_Table
      *
      * @return bool
      */
-    public function process_bulk_actions()
+    public function processBulkActions()
     {
         // Bulk installation process.
         if ('tgmpa-bulk-install' === $this->current_action() || 'tgmpa-bulk-update' === $this->current_action()) {
@@ -1015,7 +1014,7 @@ class ListTable extends \WP_List_Table
         }
 
         return false;
-    }//end process_bulk_actions()
+    }
 
 
     /**
@@ -1025,7 +1024,7 @@ class ListTable extends \WP_List_Table
      *
      * @return void
      */
-    public function prepare_items()
+    public function prepareItems()
     {
         $columns               = $this->get_columns(); // Get all necessary column information.
         $hidden                = array(); // No columns to hide, but we must set as an array.
@@ -1035,12 +1034,12 @@ class ListTable extends \WP_List_Table
 
         // Process our bulk activations here.
         if ('tgmpa-bulk-activate' === $this->current_action()) {
-            $this->process_bulk_actions();
+            $this->processBulkActions();
         }
 
         // Store all of our plugin data into $items array so WP_List_Table can use it.
         $this->items = apply_filters('tgmpa_table_data_items', $this->gatherPluginData());
-    }//end prepare_items()
+    }
 }//end class
 
 ?>
