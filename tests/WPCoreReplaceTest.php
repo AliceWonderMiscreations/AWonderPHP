@@ -121,3 +121,5 @@ final class WPCoreReplaceTest extends TestCase
         $this->assertEquals($expected, $actual);
     }//end testModifyQueryArgsWithInternationalized()
 }//end class
+
+?>
