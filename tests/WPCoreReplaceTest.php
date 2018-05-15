@@ -45,9 +45,9 @@ final class WPCoreReplaceTest extends TestCase
     {
         $url = 'http://www.example.org/whatever.php?a=cats&b=dogs&c=goldfish';
         $removeQueryArgs = array(
-            'a' => '',
-            'b' => '',
-            'c' => ''
+            'a',
+            'b',
+            'c'
         );
         $expected = 'http://www.example.org/whatever.php';
         $actual = \AWonderPHP\PluggableUnplugged\WPCoreReplace::modifyQueryArgs($url, array(), $removeQueryArgs);
@@ -63,8 +63,8 @@ final class WPCoreReplaceTest extends TestCase
     {
         $url = 'http://www.example.org/whatever.php?a=cats&b=dogs&c=goldfish';
         $removeQueryArgs = array(
-            'a' => '',
-            'b' => ''
+            'a',
+            'b'
         );
         $addQueryArgs = array(
             'd' => 'dancing+hamsters',
@@ -85,8 +85,8 @@ final class WPCoreReplaceTest extends TestCase
     {
         $url = 'http://www.example.org/whatever.php?a=cats&b=dogs&c=goldfish';
         $removeQueryArgs = array(
-            'a' => '',
-            'b' => ''
+            'a',
+            'b'
         );
         $addQueryArgs = array(
             'd' => 'dancing+hamsters',
