@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @link    https://github.com/AliceWonderMiscreations/AWonderPHP
  */
 
-namespace AWonderPHP;
+namespace AWonderPHP\OpenGraph;
 
 /**
  * Class for creating OpenGraph and TwitterCards
