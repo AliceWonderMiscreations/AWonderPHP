@@ -125,6 +125,14 @@ class UnpluggedStatic
      */
     public static function hashPassword(string $password): string
     {
+        if (defined('PASSWORD_SALT')) {
+            // prehash the password
+            $key = hash('sha256', PASSWORD_SALT, true);
+            $raw = sodium_crypto_generichash($password, $key, 64);
+            $password = base64_encode($raw);
+            sodium_memzero($key);
+            sodium_memzero($raw);
+        }
         $hash_str = sodium_crypto_pwhash_str(
             $password,
             SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
@@ -145,8 +153,21 @@ class UnpluggedStatic
     public static function checkPassword(string $password, string $hash): bool
     {
         $return = false;
-        if (sodium_crypto_pwhash_str_verify($hash, $password)) {
-            $return = true;
+        if (defined('PASSWORD_SALT')) {
+            $key = hash('sha256', PASSWORD_SALT, true);
+            $raw = sodium_crypto_generichash($password, $key, 64);
+            $testpassword = base64_encode($raw);
+            if (sodium_crypto_pwhash_str_verify($hash, $testpassword)) {
+                $return = true;
+            }
+            sodium_memzero($key);
+            sodium_memzero($raw);
+            sodium_memzero($testpassword);
+        }
+        if (! $return) {
+            if (sodium_crypto_pwhash_str_verify($hash, $password)) {
+                $return = true;
+            }
         }
         sodium_memzero($password);
         return $return;
